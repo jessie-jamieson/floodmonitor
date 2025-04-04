@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_fa3133b6c61bac460341e3f5573a11ac {
+                #map_4b0a6cd3d7c67ad7d966b9883d366df4 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -43,7 +43,7 @@
     
          <div style="position: fixed; top: 10px; left: 50px; width: 300px; z-index:9999; background-color:white; padding: 10px; border-radius: 5px; border:2px solid grey;">
          <h3 style="font-size:16px"><b>Interactive Flood and Road Closure Map</b></h3>
-         <p style="font-size:12px">Last updated: 2025-04-04 23:03:13</p>
+         <p style="font-size:12px">Last updated: 2025-04-04 23:31:54</p>
          <p style="font-size:12px"><b>Click anywhere on the map</b> to see flood data and road closures within a 50-mile radius.</p>
          <p style="font-size:12px">Using 100% free data sources.</p>
          </div>
@@ -60,10 +60,10 @@
     
             <div style="position: fixed; bottom: 20px; left: 50px; width: 250px; z-index:9999; background-color:white; padding: 10px; border-radius: 5px; border:2px solid grey;">
                 <h4 style="font-size:14px"><b>Data Summary</b></h4>
-                <p style="font-size:12px"><b>Flood Monitoring Points:</b> 10</p>
+                <p style="font-size:12px"><b>Flood Monitoring Points:</b> 50</p>
                 <p style="font-size:12px"><b>Road Closures/Issues:</b> 8</p>
-                <p style="font-size:12px"><b>High Flood Level Areas:</b> 1</p>
-                <p style="font-size:12px"><b>Closed Roads:</b> 2</p>
+                <p style="font-size:12px"><b>High Flood Level Areas:</b> 0</p>
+                <p style="font-size:12px"><b>Closed Roads:</b> 7</p>
                 <p style="font-size:10px"><i>Data includes a mix of real USGS data (when available) and sample data for demonstration.</i></p>
             </div>
             
@@ -96,11 +96,12 @@
     </div>
     
     
-            <div class="folium-map" id="map_fa3133b6c61bac460341e3f5573a11ac" ></div>
+            <div class="folium-map" id="map_4b0a6cd3d7c67ad7d966b9883d366df4" ></div>
         
 </body>
 <script>
-
+    
+    <script>
     function updateMapOnClick(e) {
         // Get the clicked coordinates
         var lat = e.latlng.lat.toFixed(6);
@@ -121,5 +122,1677 @@
     // Add click event listener to the map
     map.on('click', updateMapOnClick);
     </script>
+    
+            var map_4b0a6cd3d7c67ad7d966b9883d366df4 = L.map(
+                "map_4b0a6cd3d7c67ad7d966b9883d366df4",
+                {
+                    center: [37.7749, -122.4194],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 9,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_82e0bc06deccc2b0d2c88473ba2f956b = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_82e0bc06deccc2b0d2c88473ba2f956b.addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var tile_layer_4e6df3d4ad1214f86597bc3e2aa94d63 = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_4e6df3d4ad1214f86597bc3e2aa94d63.addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var tile_layer_80ac416c49a2063aa9358b01e21d162f = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_80ac416c49a2063aa9358b01e21d162f.addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var tile_layer_80ca4d8259d20921261617f8aed14cbd = L.tileLayer(
+                "https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Map tiles by \u003ca href=\"http://stamen.com\"\u003eStamen Design\u003c/a\u003e, under \u003ca href=\"http://creativecommons.org/licenses/by/3.0\"\u003eCC BY 3.0\u003c/a\u003e. Data by \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_80ca4d8259d20921261617f8aed14cbd.addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var marker_aaccb3ba15536acbed0899124272f30c = L.marker(
+                [37.7749, -122.4194],
+                {
+}
+            ).addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var icon_865a7c9bbb56cd00c7ba0f0e0c6b3ecd = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "green",
+  "iconColor": "white",
+  "icon": "crosshairs",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_c86a6a9e691303dc565b9a01c440c9c4 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_a951ccbe4d43f6ab2fe691976c0556be = $(`<div id="html_a951ccbe4d43f6ab2fe691976c0556be" style="width: 100.0%; height: 100.0%;">Selected Point: 37.7749, -122.4194</div>`)[0];
+                popup_c86a6a9e691303dc565b9a01c440c9c4.setContent(html_a951ccbe4d43f6ab2fe691976c0556be);
+            
+        
+
+        marker_aaccb3ba15536acbed0899124272f30c.bindPopup(popup_c86a6a9e691303dc565b9a01c440c9c4)
+        ;
+
+        
+    
+    
+                marker_aaccb3ba15536acbed0899124272f30c.setIcon(icon_865a7c9bbb56cd00c7ba0f0e0c6b3ecd);
+            
+    
+            var circle_a26301efc359b24b95d99a18ca363bd1 = L.circle(
+                [37.7749, -122.4194],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.1, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 80467.0, "stroke": true, "weight": 3}
+            ).addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+        var popup_2e7a1d27845976e9abf021a4c068dd0c = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_ffb373032162613ae374ebfb1554110d = $(`<div id="html_ffb373032162613ae374ebfb1554110d" style="width: 100.0%; height: 100.0%;">50 mile radius</div>`)[0];
+                popup_2e7a1d27845976e9abf021a4c068dd0c.setContent(html_ffb373032162613ae374ebfb1554110d);
+            
+        
+
+        circle_a26301efc359b24b95d99a18ca363bd1.bindPopup(popup_2e7a1d27845976e9abf021a4c068dd0c)
+        ;
+
+        
+    
+    
+            var feature_group_5c06461db3eb2674ea2868f7917233ba = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_2b855b3097be838a44de9490673f3bfa = L.circleMarker(
+                [37.5476944, -122.4208889],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_5037437f621307e200f6c017196250cf = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a4746741efe9f9391ad445cec10df767 = $(`<div id="html_a4746741efe9f9391ad445cec10df767" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C BL SPILLWAY NR HILLSBOROUGH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.87 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 15.7 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_5037437f621307e200f6c017196250cf.setContent(html_a4746741efe9f9391ad445cec10df767);
+            
+        
+
+        circle_marker_2b855b3097be838a44de9490673f3bfa.bindPopup(popup_5037437f621307e200f6c017196250cf)
+        ;
+
+        
+    
+    
+            var circle_marker_333903bbb1c8ffd122963a1b5a20b217 = L.circleMarker(
+                [37.5476944, -122.4208889],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_b625ca177e722fb9ef1be3cfb83b67c0 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8a7a8c936ba8aff54f129198b8bcdc30 = $(`<div id="html_8a7a8c936ba8aff54f129198b8bcdc30" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C BL SPILLWAY NR HILLSBOROUGH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.27 Gage height, ft<br>             <b>Distance:</b> 15.7 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_b625ca177e722fb9ef1be3cfb83b67c0.setContent(html_8a7a8c936ba8aff54f129198b8bcdc30);
+            
+        
+
+        circle_marker_333903bbb1c8ffd122963a1b5a20b217.bindPopup(popup_b625ca177e722fb9ef1be3cfb83b67c0)
+        ;
+
+        
+    
+    
+            var circle_marker_3de893358ffaf8c5c0395e34a9b47649 = L.circleMarker(
+                [37.5281389, -122.4000833],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_c13a44dae4f0a3d3b3c2d81e2d9f3f8f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a9def1d24045f2c42db26e73570f782d = $(`<div id="html_a9def1d24045f2c42db26e73570f782d" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C AB STONE DAM NR HILLSBOROUGH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 4.57 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 17.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_c13a44dae4f0a3d3b3c2d81e2d9f3f8f.setContent(html_a9def1d24045f2c42db26e73570f782d);
+            
+        
+
+        circle_marker_3de893358ffaf8c5c0395e34a9b47649.bindPopup(popup_c13a44dae4f0a3d3b3c2d81e2d9f3f8f)
+        ;
+
+        
+    
+    
+            var circle_marker_bb04960b9befb5dafb6789255b4ab76d = L.circleMarker(
+                [37.5281389, -122.4000833],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_bd03646815e8939243c0482b93d940f8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3f366cf70adf361474867bf99bbb1b20 = $(`<div id="html_3f366cf70adf361474867bf99bbb1b20" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C AB STONE DAM NR HILLSBOROUGH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.19 Gage height, ft<br>             <b>Distance:</b> 17.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_bd03646815e8939243c0482b93d940f8.setContent(html_3f366cf70adf361474867bf99bbb1b20);
+            
+        
+
+        circle_marker_bb04960b9befb5dafb6789255b4ab76d.bindPopup(popup_bd03646815e8939243c0482b93d940f8)
+        ;
+
+        
+    
+    
+            var circle_marker_24355784d6493ab3ea931bbd2803012d = L.circleMarker(
+                [37.5246167, -122.3993735],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_d0ea22d6d3c699c9abc6ba2eadad6d56 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f649303525ac55ae95e11a08da59d526 = $(`<div id="html_f649303525ac55ae95e11a08da59d526" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C BL STONE DAM NR HILLSBOROUGH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.41 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 17.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_d0ea22d6d3c699c9abc6ba2eadad6d56.setContent(html_f649303525ac55ae95e11a08da59d526);
+            
+        
+
+        circle_marker_24355784d6493ab3ea931bbd2803012d.bindPopup(popup_d0ea22d6d3c699c9abc6ba2eadad6d56)
+        ;
+
+        
+    
+    
+            var circle_marker_b5a9b197284daa6e6a75d012e2118865 = L.circleMarker(
+                [37.5246167, -122.3993735],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_e43cbbee7f3dc3eed097c853dfb0c073 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a1b449d1763e192591160afb256c4f56 = $(`<div id="html_a1b449d1763e192591160afb256c4f56" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C BL STONE DAM NR HILLSBOROUGH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 5.19 Gage height, ft<br>             <b>Distance:</b> 17.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_e43cbbee7f3dc3eed097c853dfb0c073.setContent(html_a1b449d1763e192591160afb256c4f56);
+            
+        
+
+        circle_marker_b5a9b197284daa6e6a75d012e2118865.bindPopup(popup_e43cbbee7f3dc3eed097c853dfb0c073)
+        ;
+
+        
+    
+    
+            var circle_marker_be1bdf8c417e2bbd5abd703e40928a27 = L.circleMarker(
+                [37.4665621, -122.4340958],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_e4fa417cd579b893d3ee8a9df3820528 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a03ea86fa754f40d0c4352af04540c8f = $(`<div id="html_a03ea86fa754f40d0c4352af04540c8f" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C A HALF MOON BAY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 16.7 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 21.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_e4fa417cd579b893d3ee8a9df3820528.setContent(html_a03ea86fa754f40d0c4352af04540c8f);
+            
+        
+
+        circle_marker_be1bdf8c417e2bbd5abd703e40928a27.bindPopup(popup_e4fa417cd579b893d3ee8a9df3820528)
+        ;
+
+        
+    
+    
+            var circle_marker_6d80de847ec67e9f64be6ff394217db2 = L.circleMarker(
+                [37.4665621, -122.4340958],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_f9ae34a14a36aa38587e8ae92f85b23e = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e380e40587ad80813272d74c18747b37 = $(`<div id="html_e380e40587ad80813272d74c18747b37" style="width: 100.0%; height: 100.0%;">             <b>PILARCITOS C A HALF MOON BAY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.31 Gage height, ft<br>             <b>Distance:</b> 21.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_f9ae34a14a36aa38587e8ae92f85b23e.setContent(html_e380e40587ad80813272d74c18747b37);
+            
+        
+
+        circle_marker_6d80de847ec67e9f64be6ff394217db2.bindPopup(popup_f9ae34a14a36aa38587e8ae92f85b23e)
+        ;
+
+        
+    
+    
+            var circle_marker_5f242667f9de13177648cfa7848f051d = L.circleMarker(
+                [37.5569722, -122.41825],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_e5cdd46698a0002dcdf90964d63c43cf = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3d6cb51995e7668e54f395bb32beaacf = $(`<div id="html_3d6cb51995e7668e54f395bb32beaacf" style="width: 100.0%; height: 100.0%;">             <b>SAN MATEO C AB JUNCTION BOX A DAM1 NR HILLSBOROUGH</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.59 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 15.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_e5cdd46698a0002dcdf90964d63c43cf.setContent(html_3d6cb51995e7668e54f395bb32beaacf);
+            
+        
+
+        circle_marker_5f242667f9de13177648cfa7848f051d.bindPopup(popup_e5cdd46698a0002dcdf90964d63c43cf)
+        ;
+
+        
+    
+    
+            var circle_marker_298ad1e236603fd057f01fb661f848bb = L.circleMarker(
+                [37.5569722, -122.41825],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_9708a0d43be212df091dfcebea3f8d35 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1181fc717b12a475d0a6dd5dd4256e84 = $(`<div id="html_1181fc717b12a475d0a6dd5dd4256e84" style="width: 100.0%; height: 100.0%;">             <b>SAN MATEO C AB JUNCTION BOX A DAM1 NR HILLSBOROUGH</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.41 Gage height, ft<br>             <b>Distance:</b> 15.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_9708a0d43be212df091dfcebea3f8d35.setContent(html_1181fc717b12a475d0a6dd5dd4256e84);
+            
+        
+
+        circle_marker_298ad1e236603fd057f01fb661f848bb.bindPopup(popup_9708a0d43be212df091dfcebea3f8d35)
+        ;
+
+        
+    
+    
+            var circle_marker_2df70350f59c490148fafd6ec620a9d2 = L.circleMarker(
+                [37.5559722, -122.4177222],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_4138ccc7ad9ce0b28a857f267ea4d720 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8fc52197dcb94a75fd71890e1ff54c0d = $(`<div id="html_8fc52197dcb94a75fd71890e1ff54c0d" style="width: 100.0%; height: 100.0%;">             <b>SAN MATEO C BL JUNCTION BOX A DAM1 NR HILLSBOROUGH</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 4.3 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 15.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_4138ccc7ad9ce0b28a857f267ea4d720.setContent(html_8fc52197dcb94a75fd71890e1ff54c0d);
+            
+        
+
+        circle_marker_2df70350f59c490148fafd6ec620a9d2.bindPopup(popup_4138ccc7ad9ce0b28a857f267ea4d720)
+        ;
+
+        
+    
+    
+            var circle_marker_0dfd24550db4c180279c8f0b76488fc0 = L.circleMarker(
+                [37.5559722, -122.4177222],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_21a255f6056059c1b3fa1376c18223c4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_96d0bce4ec4d8f9deaecdc251c08b045 = $(`<div id="html_96d0bce4ec4d8f9deaecdc251c08b045" style="width: 100.0%; height: 100.0%;">             <b>SAN MATEO C BL JUNCTION BOX A DAM1 NR HILLSBOROUGH</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.83 Gage height, ft<br>             <b>Distance:</b> 15.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_21a255f6056059c1b3fa1376c18223c4.setContent(html_96d0bce4ec4d8f9deaecdc251c08b045);
+            
+        
+
+        circle_marker_0dfd24550db4c180279c8f0b76488fc0.bindPopup(popup_21a255f6056059c1b3fa1376c18223c4)
+        ;
+
+        
+    
+    
+            var circle_marker_1ea7104593397dd19af56836b7d00db2 = L.circleMarker(
+                [37.5294444, -122.3583333],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_d79aaa9d7a113488c4497e484800d687 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_235e00316291266815895916e100ea30 = $(`<div id="html_235e00316291266815895916e100ea30" style="width: 100.0%; height: 100.0%;">             <b>SAN MATEO C BL LO CRYSTAL SP RES NR SAN MATEO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 6.04 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 17.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_d79aaa9d7a113488c4497e484800d687.setContent(html_235e00316291266815895916e100ea30);
+            
+        
+
+        circle_marker_1ea7104593397dd19af56836b7d00db2.bindPopup(popup_d79aaa9d7a113488c4497e484800d687)
+        ;
+
+        
+    
+    
+            var circle_marker_4a92072f536b710717e9bfaa9c594e0d = L.circleMarker(
+                [37.5294444, -122.3583333],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_d02cb4d224b8c32ba3d0e708cf2db16f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e5cbb6b588c631ff4f4f173f1dc04af9 = $(`<div id="html_e5cbb6b588c631ff4f4f173f1dc04af9" style="width: 100.0%; height: 100.0%;">             <b>SAN MATEO C BL LO CRYSTAL SP RES NR SAN MATEO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 4.18 Gage height, ft<br>             <b>Distance:</b> 17.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_d02cb4d224b8c32ba3d0e708cf2db16f.setContent(html_e5cbb6b588c631ff4f4f173f1dc04af9);
+            
+        
+
+        circle_marker_4a92072f536b710717e9bfaa9c594e0d.bindPopup(popup_d02cb4d224b8c32ba3d0e708cf2db16f)
+        ;
+
+        
+    
+    
+            var circle_marker_95c5996c4e8e66091617d61eb65316a1 = L.circleMarker(
+                [37.4232726, -122.1894095],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_2ac5f0b4afe0c9ca8215d94797fc6784 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4ffa85a259c0516373f11e802f3ea481 = $(`<div id="html_4ffa85a259c0516373f11e802f3ea481" style="width: 100.0%; height: 100.0%;">             <b>SAN FRANCISQUITO C A STANFORD UNIVERSITY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 20.6 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 27.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_2ac5f0b4afe0c9ca8215d94797fc6784.setContent(html_4ffa85a259c0516373f11e802f3ea481);
+            
+        
+
+        circle_marker_95c5996c4e8e66091617d61eb65316a1.bindPopup(popup_2ac5f0b4afe0c9ca8215d94797fc6784)
+        ;
+
+        
+    
+    
+            var circle_marker_4f01a5d102aeb8b12f43a3cf33ba2840 = L.circleMarker(
+                [37.4232726, -122.1894095],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_5fdfcaa18810268e5de5eac0c7587950 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9ed177df750ad0e69d2507b9c086fac3 = $(`<div id="html_9ed177df750ad0e69d2507b9c086fac3" style="width: 100.0%; height: 100.0%;">             <b>SAN FRANCISQUITO C A STANFORD UNIVERSITY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.94 Gage height, ft<br>             <b>Distance:</b> 27.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_5fdfcaa18810268e5de5eac0c7587950.setContent(html_9ed177df750ad0e69d2507b9c086fac3);
+            
+        
+
+        circle_marker_4f01a5d102aeb8b12f43a3cf33ba2840.bindPopup(popup_5fdfcaa18810268e5de5eac0c7587950)
+        ;
+
+        
+    
+    
+            var circle_marker_38214533e827c29dfdf8bfc1a0d4435d = L.circleMarker(
+                [37.5666024, -122.0016278],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_cb7c57c03b9a95265675793eb0d1b2e6 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_4a0775145fb4f1f44d32b56d93111e74 = $(`<div id="html_4a0775145fb4f1f44d32b56d93111e74" style="width: 100.0%; height: 100.0%;">             <b>ALAMEDA C NR FREMONT CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 40.3 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 27.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_cb7c57c03b9a95265675793eb0d1b2e6.setContent(html_4a0775145fb4f1f44d32b56d93111e74);
+            
+        
+
+        circle_marker_38214533e827c29dfdf8bfc1a0d4435d.bindPopup(popup_cb7c57c03b9a95265675793eb0d1b2e6)
+        ;
+
+        
+    
+    
+            var circle_marker_8ceccdb727ca318ed2b0f5c0e1ba8e63 = L.circleMarker(
+                [37.5666024, -122.0016278],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_0db570ea6333fdc626915fa53b68be68 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_78d6ffcf92c0d628fde400041f249cad = $(`<div id="html_78d6ffcf92c0d628fde400041f249cad" style="width: 100.0%; height: 100.0%;">             <b>ALAMEDA C NR FREMONT CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 6.03 Gage height, ft<br>             <b>Distance:</b> 27.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_0db570ea6333fdc626915fa53b68be68.setContent(html_78d6ffcf92c0d628fde400041f249cad);
+            
+        
+
+        circle_marker_8ceccdb727ca318ed2b0f5c0e1ba8e63.bindPopup(popup_0db570ea6333fdc626915fa53b68be68)
+        ;
+
+        
+    
+    
+            var circle_marker_6d72fdfefb149f3f758e171692525f8d = L.circleMarker(
+                [37.6060452, -122.0238504],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_21b80248b64d1db3279d97c889374497 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_1801f01fd42c796add10d96295294a39 = $(`<div id="html_1801f01fd42c796add10d96295294a39" style="width: 100.0%; height: 100.0%;">             <b>DRY C A UNION CITY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.17 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 24.6 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_21b80248b64d1db3279d97c889374497.setContent(html_1801f01fd42c796add10d96295294a39);
+            
+        
+
+        circle_marker_6d72fdfefb149f3f758e171692525f8d.bindPopup(popup_21b80248b64d1db3279d97c889374497)
+        ;
+
+        
+    
+    
+            var circle_marker_ff0892edcb47af32b84e516550e0ad17 = L.circleMarker(
+                [37.6060452, -122.0238504],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_3e583a0920a1dde6863db710f6439fc2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a013c18609ad1e926e115e32268a4bc8 = $(`<div id="html_a013c18609ad1e926e115e32268a4bc8" style="width: 100.0%; height: 100.0%;">             <b>DRY C A UNION CITY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.24 Gage height, ft<br>             <b>Distance:</b> 24.6 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:15:00.000-07:00<br>             </div>`)[0];
+                popup_3e583a0920a1dde6863db710f6439fc2.setContent(html_a013c18609ad1e926e115e32268a4bc8);
+            
+        
+
+        circle_marker_ff0892edcb47af32b84e516550e0ad17.bindPopup(popup_3e583a0920a1dde6863db710f6439fc2)
+        ;
+
+        
+    
+    
+            var circle_marker_b1ede98701aaa3e66a2e2064dc52b7dc = L.circleMarker(
+                [37.5857682, -122.0482955],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_8f93670e9bbe1f7147370790b2c1cca2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_5163cb8afe2f4632ae110462f3abd589 = $(`<div id="html_5163cb8afe2f4632ae110462f3abd589" style="width: 100.0%; height: 100.0%;">             <b>ALAMEDA C FLOOD CHANNEL A UNION CITY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 42.4 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 24.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_8f93670e9bbe1f7147370790b2c1cca2.setContent(html_5163cb8afe2f4632ae110462f3abd589);
+            
+        
+
+        circle_marker_b1ede98701aaa3e66a2e2064dc52b7dc.bindPopup(popup_8f93670e9bbe1f7147370790b2c1cca2)
+        ;
+
+        
+    
+    
+            var circle_marker_138f925e7dab0f1ca1fb2bd53aebdd04 = L.circleMarker(
+                [37.5857682, -122.0482955],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_9a67fe2f24c97fc4de48615da58fa0ba = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7cbfa3ac4a48cbcabcd2bb7231ff057f = $(`<div id="html_7cbfa3ac4a48cbcabcd2bb7231ff057f" style="width: 100.0%; height: 100.0%;">             <b>ALAMEDA C FLOOD CHANNEL A UNION CITY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 7.47 Gage height, ft<br>             <b>Distance:</b> 24.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_9a67fe2f24c97fc4de48615da58fa0ba.setContent(html_7cbfa3ac4a48cbcabcd2bb7231ff057f);
+            
+        
+
+        circle_marker_138f925e7dab0f1ca1fb2bd53aebdd04.bindPopup(popup_9a67fe2f24c97fc4de48615da58fa0ba)
+        ;
+
+        
+    
+    
+            var circle_marker_38978508678754a2391bef294e2c694f = L.circleMarker(
+                [37.695172, -122.0449223],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_b6ec48309ea00231aad17f6cc6d11f2f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3310dba15a34458a137678255e53ac21 = $(`<div id="html_3310dba15a34458a137678255e53ac21" style="width: 100.0%; height: 100.0%;">             <b>SAN LORENZO C AB DON CASTRO RES NR CASTRO V CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.07 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 21.2 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:20:00.000-07:00<br>             </div>`)[0];
+                popup_b6ec48309ea00231aad17f6cc6d11f2f.setContent(html_3310dba15a34458a137678255e53ac21);
+            
+        
+
+        circle_marker_38978508678754a2391bef294e2c694f.bindPopup(popup_b6ec48309ea00231aad17f6cc6d11f2f)
+        ;
+
+        
+    
+    
+            var circle_marker_94f3fee477f9d17384b516d86858fb20 = L.circleMarker(
+                [37.695172, -122.0449223],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_621c9fd2c8a9b04c3cfff42b53c29934 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f63a5a88358aec5f4bf4250269b6f686 = $(`<div id="html_f63a5a88358aec5f4bf4250269b6f686" style="width: 100.0%; height: 100.0%;">             <b>SAN LORENZO C AB DON CASTRO RES NR CASTRO V CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 7.75 Gage height, ft<br>             <b>Distance:</b> 21.2 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:20:00.000-07:00<br>             </div>`)[0];
+                popup_621c9fd2c8a9b04c3cfff42b53c29934.setContent(html_f63a5a88358aec5f4bf4250269b6f686);
+            
+        
+
+        circle_marker_94f3fee477f9d17384b516d86858fb20.bindPopup(popup_621c9fd2c8a9b04c3cfff42b53c29934)
+        ;
+
+        
+    
+    
+            var circle_marker_bf43fd6a829597986f012a2c852c547f = L.circleMarker(
+                [37.7049301, -122.0438508],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_f3d246bbaa47048ce2082fca773e879a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8b28d365396fffecde9bdf889da891f8 = $(`<div id="html_8b28d365396fffecde9bdf889da891f8" style="width: 100.0%; height: 100.0%;">             <b>CROW C NR HAYWARD CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.49 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 21.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:45:00.000-07:00<br>             </div>`)[0];
+                popup_f3d246bbaa47048ce2082fca773e879a.setContent(html_8b28d365396fffecde9bdf889da891f8);
+            
+        
+
+        circle_marker_bf43fd6a829597986f012a2c852c547f.bindPopup(popup_f3d246bbaa47048ce2082fca773e879a)
+        ;
+
+        
+    
+    
+            var circle_marker_a3c21e7fef5175aa296d0ef5a07c1f1f = L.circleMarker(
+                [37.7049301, -122.0438508],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_e22b4aadb4935e3daab669b6c1338d14 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_abf8b8bc9c2c2429cc6bd50254adc6c9 = $(`<div id="html_abf8b8bc9c2c2429cc6bd50254adc6c9" style="width: 100.0%; height: 100.0%;">             <b>CROW C NR HAYWARD CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.35 Gage height, ft<br>             <b>Distance:</b> 21.1 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:45:00.000-07:00<br>             </div>`)[0];
+                popup_e22b4aadb4935e3daab669b6c1338d14.setContent(html_abf8b8bc9c2c2429cc6bd50254adc6c9);
+            
+        
+
+        circle_marker_a3c21e7fef5175aa296d0ef5a07c1f1f.bindPopup(popup_e22b4aadb4935e3daab669b6c1338d14)
+        ;
+
+        
+    
+    
+            var circle_marker_e82e6feb9d157cf969085907a99c4df4 = L.circleMarker(
+                [37.7176715, -122.0543673],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_9467f5f7f9059dbd2c6e40db13d76448 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e437250b638db96f62dd83c9e0fbd17b = $(`<div id="html_e437250b638db96f62dd83c9e0fbd17b" style="width: 100.0%; height: 100.0%;">             <b>CULL C AB CULL C RES NR CASTRO VALLEY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.04 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 20.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:50:00.000-07:00<br>             </div>`)[0];
+                popup_9467f5f7f9059dbd2c6e40db13d76448.setContent(html_e437250b638db96f62dd83c9e0fbd17b);
+            
+        
+
+        circle_marker_e82e6feb9d157cf969085907a99c4df4.bindPopup(popup_9467f5f7f9059dbd2c6e40db13d76448)
+        ;
+
+        
+    
+    
+            var circle_marker_a5292dac336665dddd5cb8e7454d4b04 = L.circleMarker(
+                [37.7176715, -122.0543673],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_ca9d014cc09cfc375b11d4ff58bfc268 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_dc6146e7fa7032542b51b00bd22f51c1 = $(`<div id="html_dc6146e7fa7032542b51b00bd22f51c1" style="width: 100.0%; height: 100.0%;">             <b>CULL C AB CULL C RES NR CASTRO VALLEY CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.01 Gage height, ft<br>             <b>Distance:</b> 20.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:50:00.000-07:00<br>             </div>`)[0];
+                popup_ca9d014cc09cfc375b11d4ff58bfc268.setContent(html_dc6146e7fa7032542b51b00bd22f51c1);
+            
+        
+
+        circle_marker_a5292dac336665dddd5cb8e7454d4b04.bindPopup(popup_ca9d014cc09cfc375b11d4ff58bfc268)
+        ;
+
+        
+    
+    
+            var circle_marker_d61294cec1e78d009f7eeceb60bb13cd = L.circleMarker(
+                [37.6854864, -122.064407],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_b3d505563e6be387e0fe2fca8d2ceafa = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9cdbf94f1b837c61a704009ee129b9e8 = $(`<div id="html_9cdbf94f1b837c61a704009ee129b9e8" style="width: 100.0%; height: 100.0%;">             <b>SAN LORENZO C A HAYWARD CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 6.46 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 20.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:20:00.000-07:00<br>             </div>`)[0];
+                popup_b3d505563e6be387e0fe2fca8d2ceafa.setContent(html_9cdbf94f1b837c61a704009ee129b9e8);
+            
+        
+
+        circle_marker_d61294cec1e78d009f7eeceb60bb13cd.bindPopup(popup_b3d505563e6be387e0fe2fca8d2ceafa)
+        ;
+
+        
+    
+    
+            var circle_marker_54ce720afe4e9249e880d5ac34e606e4 = L.circleMarker(
+                [37.6854864, -122.064407],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_1976d23527353870758c222ae5dbd4b9 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_792d1e95a85f7a07ea224e03db4374a3 = $(`<div id="html_792d1e95a85f7a07ea224e03db4374a3" style="width: 100.0%; height: 100.0%;">             <b>SAN LORENZO C A HAYWARD CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.0 Gage height, ft<br>             <b>Distance:</b> 20.3 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:20:00.000-07:00<br>             </div>`)[0];
+                popup_1976d23527353870758c222ae5dbd4b9.setContent(html_792d1e95a85f7a07ea224e03db4374a3);
+            
+        
+
+        circle_marker_54ce720afe4e9249e880d5ac34e606e4.bindPopup(popup_1976d23527353870758c222ae5dbd4b9)
+        ;
+
+        
+    
+    
+            var circle_marker_67af505f62052a518f4d8d7e20fc52fb = L.circleMarker(
+                [37.6799311, -122.0805186],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_0b9c66d47df75f03fe74b458177ec036 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_7051e6c853cb803795b2362f047311ed = $(`<div id="html_7051e6c853cb803795b2362f047311ed" style="width: 100.0%; height: 100.0%;">             <b>CASTRO VALLEY C A HAYWARD CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.74 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 19.6 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:20:00.000-07:00<br>             </div>`)[0];
+                popup_0b9c66d47df75f03fe74b458177ec036.setContent(html_7051e6c853cb803795b2362f047311ed);
+            
+        
+
+        circle_marker_67af505f62052a518f4d8d7e20fc52fb.bindPopup(popup_0b9c66d47df75f03fe74b458177ec036)
+        ;
+
+        
+    
+    
+            var circle_marker_c8dd014716e7b1b8bddd08a6f06fb72a = L.circleMarker(
+                [37.6799311, -122.0805186],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_4ae57320e20aacd4c626ce37227f8cd4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_27ff06709adfd2c827a27aeb0428085e = $(`<div id="html_27ff06709adfd2c827a27aeb0428085e" style="width: 100.0%; height: 100.0%;">             <b>CASTRO VALLEY C A HAYWARD CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.91 Gage height, ft<br>             <b>Distance:</b> 19.6 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:20:00.000-07:00<br>             </div>`)[0];
+                popup_4ae57320e20aacd4c626ce37227f8cd4.setContent(html_27ff06709adfd2c827a27aeb0428085e);
+            
+        
+
+        circle_marker_c8dd014716e7b1b8bddd08a6f06fb72a.bindPopup(popup_4ae57320e20aacd4c626ce37227f8cd4)
+        ;
+
+        
+    
+    
+            var circle_marker_4cae032b34d3ad08df932bc0a2b0c59e = L.circleMarker(
+                [37.6840977, -122.1399649],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_878bd9ab817d66512b2902c510fc20ef = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_691356d7bcaf4435d834087755d8c14e = $(`<div id="html_691356d7bcaf4435d834087755d8c14e" style="width: 100.0%; height: 100.0%;">             <b>SAN LORENZO C A SAN LORENZO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 10.4 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 16.5 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_878bd9ab817d66512b2902c510fc20ef.setContent(html_691356d7bcaf4435d834087755d8c14e);
+            
+        
+
+        circle_marker_4cae032b34d3ad08df932bc0a2b0c59e.bindPopup(popup_878bd9ab817d66512b2902c510fc20ef)
+        ;
+
+        
+    
+    
+            var circle_marker_c707a2c5013f5dfbbf6065fd81ea21be = L.circleMarker(
+                [37.6840977, -122.1399649],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_65b3892aa93631f3ff4ea743a246eb57 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_645fd0fd2f7bc936ffd2e64b867db503 = $(`<div id="html_645fd0fd2f7bc936ffd2e64b867db503" style="width: 100.0%; height: 100.0%;">             <b>SAN LORENZO C A SAN LORENZO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.06 Gage height, ft<br>             <b>Distance:</b> 16.5 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_65b3892aa93631f3ff4ea743a246eb57.setContent(html_645fd0fd2f7bc936ffd2e64b867db503);
+            
+        
+
+        circle_marker_c707a2c5013f5dfbbf6065fd81ea21be.bindPopup(popup_65b3892aa93631f3ff4ea743a246eb57)
+        ;
+
+        
+    
+    
+            var circle_marker_c5c11b9cd28d23d0f82ac2bc1267733e = L.circleMarker(
+                [37.7729487, -121.9946443],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_2085af89a1fc994a2ee8749e7a16108f = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_259b16703f0d3e5237712f2a9e8fc1f7 = $(`<div id="html_259b16703f0d3e5237712f2a9e8fc1f7" style="width: 100.0%; height: 100.0%;">             <b>SAN RAMON C A SAN RAMON CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.19 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 23.2 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:45:00.000-07:00<br>             </div>`)[0];
+                popup_2085af89a1fc994a2ee8749e7a16108f.setContent(html_259b16703f0d3e5237712f2a9e8fc1f7);
+            
+        
+
+        circle_marker_c5c11b9cd28d23d0f82ac2bc1267733e.bindPopup(popup_2085af89a1fc994a2ee8749e7a16108f)
+        ;
+
+        
+    
+    
+            var circle_marker_1c41cf5db353de891b2d6dc2e7f59fef = L.circleMarker(
+                [37.7729487, -121.9946443],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_651f40a9ebcb43455f054e19ab1a7f68 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_44543ceb03751a2ed712be6c737110c5 = $(`<div id="html_44543ceb03751a2ed712be6c737110c5" style="width: 100.0%; height: 100.0%;">             <b>SAN RAMON C A SAN RAMON CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.71 Gage height, ft<br>             <b>Distance:</b> 23.2 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:45:00.000-07:00<br>             </div>`)[0];
+                popup_651f40a9ebcb43455f054e19ab1a7f68.setContent(html_44543ceb03751a2ed712be6c737110c5);
+            
+        
+
+        circle_marker_1c41cf5db353de891b2d6dc2e7f59fef.bindPopup(popup_651f40a9ebcb43455f054e19ab1a7f68)
+        ;
+
+        
+    
+    
+            var circle_marker_5d3234dcab303d1de290e9b8d660df15 = L.circleMarker(
+                [38.1076593, -122.5799419],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_5c8e156e3cccb0b357fa0345f9446205 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e51ffe6e127977d6f2d5391bb47354c2 = $(`<div id="html_e51ffe6e127977d6f2d5391bb47354c2" style="width: 100.0%; height: 100.0%;">             <b>NOVATO C A NOVATO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.24 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 24.6 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_5c8e156e3cccb0b357fa0345f9446205.setContent(html_e51ffe6e127977d6f2d5391bb47354c2);
+            
+        
+
+        circle_marker_5d3234dcab303d1de290e9b8d660df15.bindPopup(popup_5c8e156e3cccb0b357fa0345f9446205)
+        ;
+
+        
+    
+    
+            var circle_marker_00295be686d1b070d3b96b28d1c1b0d1 = L.circleMarker(
+                [38.1076593, -122.5799419],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_56f31e42c6e34a639bfda819bededba7 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2d5b0c360fc4767144b43fc796bc21b7 = $(`<div id="html_2d5b0c360fc4767144b43fc796bc21b7" style="width: 100.0%; height: 100.0%;">             <b>NOVATO C A NOVATO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 3.05 Gage height, ft<br>             <b>Distance:</b> 24.6 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_56f31e42c6e34a639bfda819bededba7.setContent(html_2d5b0c360fc4767144b43fc796bc21b7);
+            
+        
+
+        circle_marker_00295be686d1b070d3b96b28d1c1b0d1.bindPopup(popup_56f31e42c6e34a639bfda819bededba7)
+        ;
+
+        
+    
+    
+            var circle_marker_6169cbbf1c8c6cd4c7a1a658dfed9300 = L.circleMarker(
+                [37.9629401, -122.5568837],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_ecec737e90898175871f7e4b45c0928d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_c655547b2c118c1145690d2c422bb610 = $(`<div id="html_c655547b2c118c1145690d2c422bb610" style="width: 100.0%; height: 100.0%;">             <b>CORTE MADERA C A ROSS CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 15.0 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 15.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_ecec737e90898175871f7e4b45c0928d.setContent(html_c655547b2c118c1145690d2c422bb610);
+            
+        
+
+        circle_marker_6169cbbf1c8c6cd4c7a1a658dfed9300.bindPopup(popup_ecec737e90898175871f7e4b45c0928d)
+        ;
+
+        
+    
+    
+            var circle_marker_089c6a24b7a29beba778111a2f04a490 = L.circleMarker(
+                [37.9629401, -122.5568837],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_867911cb4ef375b8d67a5278ebb92567 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_2916f1998fe7e034199c6844f4004d70 = $(`<div id="html_2916f1998fe7e034199c6844f4004d70" style="width: 100.0%; height: 100.0%;">             <b>CORTE MADERA C A ROSS CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 4.59 Gage height, ft<br>             <b>Distance:</b> 15.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_867911cb4ef375b8d67a5278ebb92567.setContent(html_2916f1998fe7e034199c6844f4004d70);
+            
+        
+
+        circle_marker_089c6a24b7a29beba778111a2f04a490.bindPopup(popup_867911cb4ef375b8d67a5278ebb92567)
+        ;
+
+        
+    
+    
+            var circle_marker_9b566183dc62fe4b664378dcabb2569b = L.circleMarker(
+                [37.8661111, -122.578611],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_0e85fdbd466956933ebaf1704a945ad4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a24229229c75d3726c25095398036900 = $(`<div id="html_a24229229c75d3726c25095398036900" style="width: 100.0%; height: 100.0%;">             <b>REDWOOD C A HWY 1 BRIDGE A MUIR BEACH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 4.11 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 10.7 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_0e85fdbd466956933ebaf1704a945ad4.setContent(html_a24229229c75d3726c25095398036900);
+            
+        
+
+        circle_marker_9b566183dc62fe4b664378dcabb2569b.bindPopup(popup_0e85fdbd466956933ebaf1704a945ad4)
+        ;
+
+        
+    
+    
+            var circle_marker_bbb7580dada129638846db5b62eec664 = L.circleMarker(
+                [37.8661111, -122.578611],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_81b02dbc18c483c4636cc0055d2098b1 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_e1a9b2569854d2df86a90dab48934e26 = $(`<div id="html_e1a9b2569854d2df86a90dab48934e26" style="width: 100.0%; height: 100.0%;">             <b>REDWOOD C A HWY 1 BRIDGE A MUIR BEACH CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.65 Gage height, ft<br>             <b>Distance:</b> 10.7 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:30:00.000-07:00<br>             </div>`)[0];
+                popup_81b02dbc18c483c4636cc0055d2098b1.setContent(html_e1a9b2569854d2df86a90dab48934e26);
+            
+        
+
+        circle_marker_bbb7580dada129638846db5b62eec664.bindPopup(popup_81b02dbc18c483c4636cc0055d2098b1)
+        ;
+
+        
+    
+    
+            var circle_marker_078787b2a10de5780c6ba4115f2ec4ef = L.circleMarker(
+                [38.0268261, -122.7363337],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_29dda09bbbd48343dbff4749a2ad47c2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_8b9710cede4876c3e0a386f0e4d92ea7 = $(`<div id="html_8b9710cede4876c3e0a386f0e4d92ea7" style="width: 100.0%; height: 100.0%;">             <b>LAGUNITAS C A SAMUEL P TAYLOR STATE PARK CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 54.7 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 24.5 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:45:00.000-07:00<br>             </div>`)[0];
+                popup_29dda09bbbd48343dbff4749a2ad47c2.setContent(html_8b9710cede4876c3e0a386f0e4d92ea7);
+            
+        
+
+        circle_marker_078787b2a10de5780c6ba4115f2ec4ef.bindPopup(popup_29dda09bbbd48343dbff4749a2ad47c2)
+        ;
+
+        
+    
+    
+            var circle_marker_be77515009858a6d64184c060addedce = L.circleMarker(
+                [38.0268261, -122.7363337],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_803f7298b86987e2c54e6f652f0c696a = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a2c6e20815fe37c437399afb383965c2 = $(`<div id="html_a2c6e20815fe37c437399afb383965c2" style="width: 100.0%; height: 100.0%;">             <b>LAGUNITAS C A SAMUEL P TAYLOR STATE PARK CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.61 Gage height, ft<br>             <b>Distance:</b> 24.5 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T15:45:00.000-07:00<br>             </div>`)[0];
+                popup_803f7298b86987e2c54e6f652f0c696a.setContent(html_a2c6e20815fe37c437399afb383965c2);
+            
+        
+
+        circle_marker_be77515009858a6d64184c060addedce.bindPopup(popup_803f7298b86987e2c54e6f652f0c696a)
+        ;
+
+        
+    
+    
+            var circle_marker_83d162b45a71baac84060eb3a0c0460d = L.circleMarker(
+                [38.0801999, -122.7844348],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_11ea5366e1aa2c4bc112a96076cc47e1 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6f20b3f897de4a05ae81767100237567 = $(`<div id="html_6f20b3f897de4a05ae81767100237567" style="width: 100.0%; height: 100.0%;">             <b>LAGUNITAS C NR PT REYES STATION CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 79.1 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 29.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_11ea5366e1aa2c4bc112a96076cc47e1.setContent(html_6f20b3f897de4a05ae81767100237567);
+            
+        
+
+        circle_marker_83d162b45a71baac84060eb3a0c0460d.bindPopup(popup_11ea5366e1aa2c4bc112a96076cc47e1)
+        ;
+
+        
+    
+    
+            var circle_marker_93daf9ad38640b8e92fb000811b13485 = L.circleMarker(
+                [38.0801999, -122.7844348],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_f2ec9e9c69aa45cc5cfac0a66b63b99c = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_0a12cbcaaf6971101afdc20293e2a86a = $(`<div id="html_0a12cbcaaf6971101afdc20293e2a86a" style="width: 100.0%; height: 100.0%;">             <b>LAGUNITAS C NR PT REYES STATION CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 2.14 Gage height, ft<br>             <b>Distance:</b> 29.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_f2ec9e9c69aa45cc5cfac0a66b63b99c.setContent(html_0a12cbcaaf6971101afdc20293e2a86a);
+            
+        
+
+        circle_marker_93daf9ad38640b8e92fb000811b13485.bindPopup(popup_f2ec9e9c69aa45cc5cfac0a66b63b99c)
+        ;
+
+        
+    
+    
+            var circle_marker_42f790821f63d54b3a014a2a61decb7f = L.circleMarker(
+                [38.0386111, -122.7858333],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_4b41ac774accaf1c73fd8e1b937d78c6 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f3b773d8f769eedea54475a45be086d1 = $(`<div id="html_f3b773d8f769eedea54475a45be086d1" style="width: 100.0%; height: 100.0%;">             <b>OLEMA C A VEDANTA BRIDGE A OLEMA CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 17.2 Streamflow, ft&#179;/s<br>             <b>Distance:</b> 27.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_4b41ac774accaf1c73fd8e1b937d78c6.setContent(html_f3b773d8f769eedea54475a45be086d1);
+            
+        
+
+        circle_marker_42f790821f63d54b3a014a2a61decb7f.bindPopup(popup_4b41ac774accaf1c73fd8e1b937d78c6)
+        ;
+
+        
+    
+    
+            var circle_marker_024e367f7a73dcf3448094c0011a739c = L.circleMarker(
+                [38.0386111, -122.7858333],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_6f203a0a21595db652d852e4d8e768c4 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_a25caeafba59e0b27211bb14aa3cda8b = $(`<div id="html_a25caeafba59e0b27211bb14aa3cda8b" style="width: 100.0%; height: 100.0%;">             <b>OLEMA C A VEDANTA BRIDGE A OLEMA CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 73.58 Gage height, ft<br>             <b>Distance:</b> 27.0 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_6f203a0a21595db652d852e4d8e768c4.setContent(html_a25caeafba59e0b27211bb14aa3cda8b);
+            
+        
+
+        circle_marker_024e367f7a73dcf3448094c0011a739c.bindPopup(popup_6f203a0a21595db652d852e4d8e768c4)
+        ;
+
+        
+    
+    
+            var circle_marker_4d9d63d841e80a050526d687759b52d4 = L.circleMarker(
+                [37.4638528, -122.0241556],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_a007c334faf89c91e30bb5c57f27e3b3 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f3019ceeb5301ab83e58d312c8bafe30 = $(`<div id="html_f3019ceeb5301ab83e58d312c8bafe30" style="width: 100.0%; height: 100.0%;">             <b>COYOTE C NR ALVISO CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 0.38 Gage height, ft<br>             <b>Distance:</b> 30.5 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T14:15:00.000-08:00<br>             </div>`)[0];
+                popup_a007c334faf89c91e30bb5c57f27e3b3.setContent(html_f3019ceeb5301ab83e58d312c8bafe30);
+            
+        
+
+        circle_marker_4d9d63d841e80a050526d687759b52d4.bindPopup(popup_a007c334faf89c91e30bb5c57f27e3b3)
+        ;
+
+        
+    
+    
+            var circle_marker_0fc98cc34482143fe9bb637a7c25b8d9 = L.circleMarker(
+                [37.5069444, -122.1163889],
+                {"bubblingMouseEvents": true, "color": "blue", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "blue", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 8, "stroke": true, "weight": 3}
+            ).addTo(feature_group_5c06461db3eb2674ea2868f7917233ba);
+        
+    
+        var popup_be1c928ce94155a23933df148d293e97 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_912a37451d393e9c5ec31cd0754d83df = $(`<div id="html_912a37451d393e9c5ec31cd0754d83df" style="width: 100.0%; height: 100.0%;">             <b>SAN FRANCISCO BAY A OLD DUMBARTON BR NR NEWARK CA</b><br>             <b>Flood Level:</b> LOW<br>             <b>Measurement:</b> 1.89 Gage height, ft<br>             <b>Distance:</b> 24.8 miles<br>             <b>Source:</b> USGS<br>             <b>Timestamp:</b> 2025-04-04T16:00:00.000-07:00<br>             </div>`)[0];
+                popup_be1c928ce94155a23933df148d293e97.setContent(html_912a37451d393e9c5ec31cd0754d83df);
+            
+        
+
+        circle_marker_0fc98cc34482143fe9bb637a7c25b8d9.bindPopup(popup_be1c928ce94155a23933df148d293e97)
+        ;
+
+        
+    
+    
+            feature_group_5c06461db3eb2674ea2868f7917233ba.addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var feature_group_8b5a531d70443909eca7cc331686ae9d = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var marker_fcdc7a82045f60b3d888d26bb1cce87e = L.marker(
+                [37.71851417955113, -122.43966255692276],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_4a8f5367d7dc4ee451e8376e453a239d = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_58a5b8d8f5d94415374647a5e4e134bf = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f40f30b08e00149767a2a0660b8198bd = $(`<div id="html_f40f30b08e00149767a2a0660b8198bd" style="width: 100.0%; height: 100.0%;">             <b>Maple Blvd</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> road washout<br>             <b>Distance:</b> 4.0 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to road washout</div>`)[0];
+                popup_58a5b8d8f5d94415374647a5e4e134bf.setContent(html_f40f30b08e00149767a2a0660b8198bd);
+            
+        
+
+        marker_fcdc7a82045f60b3d888d26bb1cce87e.bindPopup(popup_58a5b8d8f5d94415374647a5e4e134bf)
+        ;
+
+        
+    
+    
+                marker_fcdc7a82045f60b3d888d26bb1cce87e.setIcon(icon_4a8f5367d7dc4ee451e8376e453a239d);
+            
+    
+            var marker_5cdb39a674a58ec423da090b0f771ca9 = L.marker(
+                [37.77652859149959, -122.19770423262932],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_e4c669336fa338db72a60e4c860835e5 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_aa2d410136ff5fd571fed4278879d34d = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_9b27ea39f22624c55a9486eed2099776 = $(`<div id="html_9b27ea39f22624c55a9486eed2099776" style="width: 100.0%; height: 100.0%;">             <b>Route 66</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> mudslide<br>             <b>Distance:</b> 12.1 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to mudslide</div>`)[0];
+                popup_aa2d410136ff5fd571fed4278879d34d.setContent(html_9b27ea39f22624c55a9486eed2099776);
+            
+        
+
+        marker_5cdb39a674a58ec423da090b0f771ca9.bindPopup(popup_aa2d410136ff5fd571fed4278879d34d)
+        ;
+
+        
+    
+    
+                marker_5cdb39a674a58ec423da090b0f771ca9.setIcon(icon_e4c669336fa338db72a60e4c860835e5);
+            
+    
+            var marker_5ef93b885393e86d8cc92fdfdd8d4343 = L.marker(
+                [37.681783715534806, -122.51806514770887],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_96713424eb29b03d782f9fe9ffa3f955 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_50067a814c80d06f2c58a9bdbc8212f2 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_6a487290484e95c6dbbc9d0b65fd051a = $(`<div id="html_6a487290484e95c6dbbc9d0b65fd051a" style="width: 100.0%; height: 100.0%;">             <b>Mountain Pass</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> water on roadway<br>             <b>Distance:</b> 8.4 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to water on roadway</div>`)[0];
+                popup_50067a814c80d06f2c58a9bdbc8212f2.setContent(html_6a487290484e95c6dbbc9d0b65fd051a);
+            
+        
+
+        marker_5ef93b885393e86d8cc92fdfdd8d4343.bindPopup(popup_50067a814c80d06f2c58a9bdbc8212f2)
+        ;
+
+        
+    
+    
+                marker_5ef93b885393e86d8cc92fdfdd8d4343.setIcon(icon_96713424eb29b03d782f9fe9ffa3f955);
+            
+    
+            var marker_982f2fe8b60065d6c74676bcc34cf7fb = L.marker(
+                [37.84018309676267, -122.46946967615472],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_18a6c6dad976ec6e20078f6214d25dd2 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_324752b01628a86d7b3c1a0511cc12d8 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_fc4dad8733485fee9bef0b899a29215d = $(`<div id="html_fc4dad8733485fee9bef0b899a29215d" style="width: 100.0%; height: 100.0%;">             <b>Bridge Rd</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> debris<br>             <b>Distance:</b> 5.3 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to debris</div>`)[0];
+                popup_324752b01628a86d7b3c1a0511cc12d8.setContent(html_fc4dad8733485fee9bef0b899a29215d);
+            
+        
+
+        marker_982f2fe8b60065d6c74676bcc34cf7fb.bindPopup(popup_324752b01628a86d7b3c1a0511cc12d8)
+        ;
+
+        
+    
+    
+                marker_982f2fe8b60065d6c74676bcc34cf7fb.setIcon(icon_18a6c6dad976ec6e20078f6214d25dd2);
+            
+    
+            var marker_ee8e1db550bbf8c87ffac7cbbd345b16 = L.marker(
+                [37.65901043723451, -122.00386976262199],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_0b46f76c283e9a4e3b04b8b8957c0bf4 = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_bc9cef22f2645b12964b8b0e351349cc = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_75683431b51ffc276d80e5232ee7983b = $(`<div id="html_75683431b51ffc276d80e5232ee7983b" style="width: 100.0%; height: 100.0%;">             <b>Valley Way</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> flooding<br>             <b>Distance:</b> 24.0 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to flooding</div>`)[0];
+                popup_bc9cef22f2645b12964b8b0e351349cc.setContent(html_75683431b51ffc276d80e5232ee7983b);
+            
+        
+
+        marker_ee8e1db550bbf8c87ffac7cbbd345b16.bindPopup(popup_bc9cef22f2645b12964b8b0e351349cc)
+        ;
+
+        
+    
+    
+                marker_ee8e1db550bbf8c87ffac7cbbd345b16.setIcon(icon_0b46f76c283e9a4e3b04b8b8957c0bf4);
+            
+    
+            var marker_621677dd816e96f1a8409653b6a3bb12 = L.marker(
+                [37.92233533423221, -122.69279980885649],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_0c8ac76e9659fb3b4e7f37a20dcff22c = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_a1ad5283a6b00d99e2da6a404800c874 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_52dc97bdc4a7fc8a521bf99bcfde69f5 = $(`<div id="html_52dc97bdc4a7fc8a521bf99bcfde69f5" style="width: 100.0%; height: 100.0%;">             <b>State Highway 99</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> road washout<br>             <b>Distance:</b> 18.1 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to road washout</div>`)[0];
+                popup_a1ad5283a6b00d99e2da6a404800c874.setContent(html_52dc97bdc4a7fc8a521bf99bcfde69f5);
+            
+        
+
+        marker_621677dd816e96f1a8409653b6a3bb12.bindPopup(popup_a1ad5283a6b00d99e2da6a404800c874)
+        ;
+
+        
+    
+    
+                marker_621677dd816e96f1a8409653b6a3bb12.setIcon(icon_0c8ac76e9659fb3b4e7f37a20dcff22c);
+            
+    
+            var marker_51d00a67995c416ffba15ce7e62869f3 = L.marker(
+                [37.62730267110827, -122.53926317691008],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_723964812dfed284f37928a8b0ad5bae = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "orange",
+  "iconColor": "white",
+  "icon": "exclamation-triangle",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_821362cdd245a109e1261cf09f66d146 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_f0bb589e6884af76099b36986f21a247 = $(`<div id="html_f0bb589e6884af76099b36986f21a247" style="width: 100.0%; height: 100.0%;">             <b>Market St</b><br>             <b>Status:</b> RESTRICTED<br>             <b>Reason:</b> road washout<br>             <b>Distance:</b> 12.1 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road restricted due to road washout</div>`)[0];
+                popup_821362cdd245a109e1261cf09f66d146.setContent(html_f0bb589e6884af76099b36986f21a247);
+            
+        
+
+        marker_51d00a67995c416ffba15ce7e62869f3.bindPopup(popup_821362cdd245a109e1261cf09f66d146)
+        ;
+
+        
+    
+    
+                marker_51d00a67995c416ffba15ce7e62869f3.setIcon(icon_723964812dfed284f37928a8b0ad5bae);
+            
+    
+            var marker_4da77513d770972832c6584b593eec0c = L.marker(
+                [37.975581400373635, -122.3881072181838],
+                {
+}
+            ).addTo(feature_group_8b5a531d70443909eca7cc331686ae9d);
+        
+    
+            var icon_cb0f654dff24a14e6843207f4cf58d3d = L.AwesomeMarkers.icon(
+                {
+  "markerColor": "red",
+  "iconColor": "white",
+  "icon": "ban",
+  "prefix": "fa",
+  "extraClasses": "fa-rotate-0",
+}
+            );
+        
+    
+        var popup_b06fb2c7df168813da5075b2411ef856 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_09f7e9ccc42da1e1d74c878bdebc4b04 = $(`<div id="html_09f7e9ccc42da1e1d74c878bdebc4b04" style="width: 100.0%; height: 100.0%;">             <b>Highway 1</b><br>             <b>Status:</b> CLOSED<br>             <b>Reason:</b> storm damage<br>             <b>Distance:</b> 14.0 miles<br>             <b>Source:</b> Sample Data<br>             <b>Details:</b> Road closed due to storm damage</div>`)[0];
+                popup_b06fb2c7df168813da5075b2411ef856.setContent(html_09f7e9ccc42da1e1d74c878bdebc4b04);
+            
+        
+
+        marker_4da77513d770972832c6584b593eec0c.bindPopup(popup_b06fb2c7df168813da5075b2411ef856)
+        ;
+
+        
+    
+    
+                marker_4da77513d770972832c6584b593eec0c.setIcon(icon_cb0f654dff24a14e6843207f4cf58d3d);
+            
+    
+            feature_group_8b5a531d70443909eca7cc331686ae9d.addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+        
+    
+            var layer_control_13c64ff3961218d7c629bc1c517ca898_layers = {
+                base_layers : {
+                    "openstreetmap" : tile_layer_82e0bc06deccc2b0d2c88473ba2f956b,
+                    "Terrain" : tile_layer_4e6df3d4ad1214f86597bc3e2aa94d63,
+                    "Toner" : tile_layer_80ac416c49a2063aa9358b01e21d162f,
+                    "Watercolor" : tile_layer_80ca4d8259d20921261617f8aed14cbd,
+                },
+                overlays :  {
+                    "Flood Levels" : feature_group_5c06461db3eb2674ea2868f7917233ba,
+                    "Road Closures" : feature_group_8b5a531d70443909eca7cc331686ae9d,
+                },
+            };
+            let layer_control_13c64ff3961218d7c629bc1c517ca898 = L.control.layers(
+                layer_control_13c64ff3961218d7c629bc1c517ca898_layers.base_layers,
+                layer_control_13c64ff3961218d7c629bc1c517ca898_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": true,
+  "autoZIndex": true,
+}
+            ).addTo(map_4b0a6cd3d7c67ad7d966b9883d366df4);
+
+        
+    
+            var mouse_position_3c4519531bec9de3f8a74f147e758592 = new L.Control.MousePosition(
+                {
+  "position": "bottomright",
+  "separator": " : ",
+  "emptyString": "Unavailable",
+  "lngFirst": false,
+  "numDigits": 5,
+  "prefix": "",
+}
+            );
+            mouse_position_3c4519531bec9de3f8a74f147e758592.options["latFormatter"] =
+                undefined;
+            mouse_position_3c4519531bec9de3f8a74f147e758592.options["lngFormatter"] =
+                undefined;
+            map_4b0a6cd3d7c67ad7d966b9883d366df4.addControl(mouse_position_3c4519531bec9de3f8a74f147e758592);
+        
 </script>
 </html>

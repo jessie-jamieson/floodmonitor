@@ -29,15 +29,25 @@ def fetch_usgs_water_data(center_lat, center_lon, radius_miles=50):
     Fetch real USGS water data if available, otherwise use fallback data
     """
     try:
-        # USGS Water Services API endpoint
-        base_url = "https://waterservices.usgs.gov/nwis/iv/"
+        # Truncate coordinates for URL parameters to 7 decimal places
+        url_lat = float(f"{center_lat:.7f}")
+        url_lon = float(f"{center_lon:.7f}")
         
         # Calculate a bounding box
         lat_offset = radius_miles / 69.0
-        lon_offset = radius_miles / (69.0 * math.cos(math.radians(center_lat)))
+        lon_offset = radius_miles / (69.0 * math.cos(math.radians(url_lat)))
         
-        # Define the bounding box (smaller area for faster response)
-        bbox = f"{center_lon - lon_offset/2},{center_lat - lat_offset/2},{center_lon + lon_offset/2},{center_lat + lat_offset/2}"
+        # Define the bounding box with truncated coordinates
+        min_lon = float(f"{(url_lon - lon_offset/2):.7f}")
+        min_lat = float(f"{(url_lat - lat_offset/2):.7f}")
+        max_lon = float(f"{(url_lon + lon_offset/2):.7f}")
+        max_lat = float(f"{(url_lat + lat_offset/2):.7f}")
+        
+        # Format the bounding box string with truncated values
+        bbox = f"{min_lon},{min_lat},{max_lon},{max_lat}"
+        
+        # USGS Water Services API endpoint
+        base_url = "https://waterservices.usgs.gov/nwis/iv/"
         
         # Parameters for the API request
         params = {
@@ -47,8 +57,12 @@ def fetch_usgs_water_data(center_lat, center_lon, radius_miles=50):
             "siteStatus": "active"
         }
         
+        # Print the URL that will be used (for debugging)
+        full_url = f"{base_url}?format=json&bBox={bbox}&parameterCd=00065,00060&siteStatus=active"
+        print(f"Fetching USGS data with URL: {full_url}")
+        
         # Make the API request with a timeout
-        response = requests.get(base_url, params=params, timeout=3)
+        response = requests.get(base_url, params=params, timeout=10)
         response.raise_for_status()
         
         data = response.json()
@@ -61,8 +75,10 @@ def fetch_usgs_water_data(center_lat, center_lon, radius_miles=50):
                 # Get site information
                 site_code = site["sourceInfo"]["siteCode"][0]["value"]
                 site_name = site["sourceInfo"]["siteName"]
-                lat = float(site["sourceInfo"]["geoLocation"]["geogLocation"]["latitude"])
-                lon = float(site["sourceInfo"]["geoLocation"]["geogLocation"]["longitude"])
+                
+                # Get coordinates and truncate to 7 decimal places for display
+                lat = float(f"{float(site['sourceInfo']['geoLocation']['geogLocation']['latitude']):.7f}")
+                lon = float(f"{float(site['sourceInfo']['geoLocation']['geogLocation']['longitude']):.7f}")
                 
                 # Check if the site is within the specified radius
                 distance = haversine_distance(center_lat, center_lon, lat, lon)
@@ -110,7 +126,7 @@ def fetch_usgs_water_data(center_lat, center_lon, radius_miles=50):
     except Exception as e:
         print(f"Error fetching USGS water data: {e}")
         return []  # Return empty list, will use fallback data later
-
+    
 def generate_sample_flood_data(center_lat, center_lon, radius_miles=50, num_points=10):
     """
     Generate sample flood data points around the center point
