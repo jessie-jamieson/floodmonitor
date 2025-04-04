@@ -5,11 +5,8 @@ import json
 from datetime import datetime
 import os
 import math
-from folium.plugins import Draw, MousePosition
-import branca.element
-import xml.etree.ElementTree as ET
-from bs4 import BeautifulSoup
-import re
+from folium.plugins import MousePosition
+import random
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     """
@@ -27,30 +24,20 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     r = 3956  # Radius of earth in miles
     return c * r
 
-def fetch_flood_data(center_lat, center_lon, radius_miles=50):
+def fetch_usgs_water_data(center_lat, center_lon, radius_miles=50):
     """
-    Fetch flood data within a radius of a given point using USGS Water Services API (free)
-    
-    Parameters:
-    - center_lat, center_lon: Center coordinates
-    - radius_miles: Search radius in miles
-    
-    Returns:
-    - List of dictionaries with flood data points
+    Fetch real USGS water data if available, otherwise use fallback data
     """
     try:
-        # USGS Water Services API endpoint for current conditions - completely free API
+        # USGS Water Services API endpoint
         base_url = "https://waterservices.usgs.gov/nwis/iv/"
         
-        # Calculate a bounding box that covers the radius
-        # This is an approximation - we'll filter by exact distance later
-        # 1 degree of latitude is approximately 69 miles
-        # 1 degree of longitude varies by latitude, roughly 69*cos(latitude) miles
+        # Calculate a bounding box
         lat_offset = radius_miles / 69.0
         lon_offset = radius_miles / (69.0 * math.cos(math.radians(center_lat)))
         
-        # Define the bounding box
-        bbox = f"{center_lon - lon_offset},{center_lat - lat_offset},{center_lon + lon_offset},{center_lat + lat_offset}"
+        # Define the bounding box (smaller area for faster response)
+        bbox = f"{center_lon - lon_offset/2},{center_lat - lat_offset/2},{center_lon + lon_offset/2},{center_lat + lat_offset/2}"
         
         # Parameters for the API request
         params = {
@@ -60,9 +47,9 @@ def fetch_flood_data(center_lat, center_lon, radius_miles=50):
             "siteStatus": "active"
         }
         
-        # Make the API request
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()  # Raise exception for HTTP errors
+        # Make the API request with a timeout
+        response = requests.get(base_url, params=params, timeout=3)
+        response.raise_for_status()
         
         data = response.json()
         
@@ -114,294 +101,149 @@ def fetch_flood_data(center_lat, center_lon, radius_miles=50):
                             "value": value,
                             "flood_level": flood_level,
                             "timestamp": timestamp,
-                            "distance": round(distance, 1)
+                            "distance": round(distance, 1),
+                            "source": "USGS"
                         })
-        
-        # Also fetch NOAA flood warnings
-        noaa_data = fetch_noaa_alerts(center_lat, center_lon, radius_miles)
-        processed_data.extend(noaa_data)
         
         return processed_data
     
     except Exception as e:
-        print(f"Error fetching flood data: {e}")
-        # Return some sample data as fallback
-        return [
-            {"id": "1", "name": "Sample Station 1", "lat": center_lat + 0.1, "lon": center_lon - 0.1, 
-             "flood_level": "high", "timestamp": "2025-04-04T10:00:00Z", "distance": 8.4},
-            {"id": "2", "name": "Sample Station 2", "lat": center_lat - 0.05, "lon": center_lon + 0.2, 
-             "flood_level": "medium", "timestamp": "2025-04-04T10:00:00Z", "distance": 12.7},
-            {"id": "3", "name": "Sample Station 3", "lat": center_lat + 0.3, "lon": center_lon + 0.1, 
-             "flood_level": "low", "timestamp": "2025-04-04T10:00:00Z", "distance": 22.5}
-        ]
+        print(f"Error fetching USGS water data: {e}")
+        return []  # Return empty list, will use fallback data later
 
-def fetch_noaa_alerts(center_lat, center_lon, radius_miles=50):
+def generate_sample_flood_data(center_lat, center_lon, radius_miles=50, num_points=10):
     """
-    Fetch NOAA weather alerts (free API) for flooding
-    
-    Parameters:
-    - center_lat, center_lon: Center coordinates
-    - radius_miles: Search radius in miles
-    
-    Returns:
-    - List of dictionaries with flood warning data
+    Generate sample flood data points around the center point
     """
-    try:
-        # NOAA Weather API is free and doesn't require a key
-        base_url = "https://api.weather.gov/alerts/active"
-        
-        # Make a request for active weather alerts
-        # NOAA API uses different parameters - we'll filter by area later
-        response = requests.get(base_url)
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        processed_alerts = []
-        
-        if "features" in data:
-            for feature in data["features"]:
-                properties = feature.get("properties", {})
-                
-                # Only get flood-related alerts
-                event = properties.get("event", "").lower()
-                if not any(term in event for term in ["flood", "rain", "storm", "water"]):
-                    continue
-                
-                # Get coordinates from geometry if available
-                geometry = feature.get("geometry", {})
-                if geometry and geometry.get("type") == "Point" and geometry.get("coordinates"):
-                    lon, lat = geometry["coordinates"]
-                elif properties.get("geocode", {}).get("SAME"):
-                    # If no direct coordinates, try to get center of affected area
-                    # This is a simplification - would need more processing for exact location
-                    lat = center_lat
-                    lon = center_lon
-                else:
-                    continue
-                
-                # Check distance from center point
-                distance = haversine_distance(center_lat, center_lon, lat, lon)
-                if distance > radius_miles:
-                    continue
-                
-                # Determine flood level based on severity
-                severity = properties.get("severity", "").lower()
-                if "extreme" in severity or "severe" in severity:
-                    flood_level = "high"
-                elif "moderate" in severity:
-                    flood_level = "medium"
-                else:
-                    flood_level = "low"
-                
-                alert = {
-                    "id": properties.get("id", "noaa-" + str(len(processed_alerts))),
-                    "name": properties.get("headline", event),
-                    "lat": lat,
-                    "lon": lon,
-                    "parameter": "NOAA Alert",
-                    "value": properties.get("severity", "Unknown"),
-                    "flood_level": flood_level,
-                    "timestamp": properties.get("sent", datetime.now().isoformat()),
-                    "distance": round(distance, 1),
-                    "description": properties.get("description", "")
-                }
-                
-                processed_alerts.append(alert)
-        
-        return processed_alerts
+    flood_data = []
     
-    except Exception as e:
-        print(f"Error fetching NOAA alerts: {e}")
-        return []
+    # Define some realistic stream/river names
+    stream_names = [
+        "Clear Creek", "Muddy River", "Rocky Branch", "Cedar Stream", 
+        "Pine River", "Oak Creek", "Maple Run", "Willow Stream",
+        "Eagle River", "Bear Creek", "Fox River", "Deer Stream"
+    ]
+    
+    # Define parameters
+    parameters = ["Gauge height, ft", "Discharge, cubic feet per second"]
+    
+    # Current timestamp
+    now = datetime.now().isoformat()
+    
+    # Generate random points within the radius
+    for i in range(num_points):
+        # Random angle and distance
+        angle = random.uniform(0, 2 * math.pi)
+        # Distribute points throughout the radius (square root gives more uniform distribution)
+        distance = random.uniform(0, radius_miles) * math.sqrt(random.random())
+        
+        # Convert to lat/lon offset
+        lat_offset = (distance / 69.0) * math.sin(angle)
+        lon_offset = (distance / (69.0 * math.cos(math.radians(center_lat)))) * math.cos(angle)
+        
+        # Create the point
+        lat = center_lat + lat_offset
+        lon = center_lon + lon_offset
+        
+        # Random flood level with weighted distribution
+        flood_level = random.choices(
+            ["low", "medium", "high"], 
+            weights=[0.6, 0.3, 0.1],  # 60% low, 30% medium, 10% high
+            k=1
+        )[0]
+        
+        # Random value based on flood level
+        parameter = random.choice(parameters)
+        if "gauge height" in parameter.lower():
+            if flood_level == "high":
+                value = round(random.uniform(15, 25), 1)
+            elif flood_level == "medium":
+                value = round(random.uniform(10, 15), 1)
+            else:
+                value = round(random.uniform(2, 10), 1)
+        else:  # discharge
+            if flood_level == "high":
+                value = round(random.uniform(10000, 20000), 0)
+            elif flood_level == "medium":
+                value = round(random.uniform(5000, 10000), 0)
+            else:
+                value = round(random.uniform(500, 5000), 0)
+        
+        flood_data.append({
+            "id": f"sample-{i}",
+            "name": random.choice(stream_names),
+            "lat": lat,
+            "lon": lon,
+            "parameter": parameter,
+            "value": value,
+            "flood_level": flood_level,
+            "timestamp": now,
+            "distance": round(distance, 1),
+            "source": "Sample Data"
+        })
+    
+    return flood_data
 
-def fetch_road_closures_openstreetmap(center_lat, center_lon, radius_miles=50):
+def generate_sample_road_closures(center_lat, center_lon, radius_miles=50, num_closures=8):
     """
-    Fetch road closures from OpenStreetMap data (free)
-    
-    Parameters:
-    - center_lat, center_lon: Center coordinates
-    - radius_miles: Search radius in miles
-    
-    Returns:
-    - List of dictionaries with road closure data
+    Generate sample road closure data around the center point
     """
-    try:
-        # Calculate a bounding box that covers the radius
-        lat_offset = radius_miles / 69.0
-        lon_offset = radius_miles / (69.0 * math.cos(math.radians(center_lat)))
-        
-        # Define bounding box
-        min_lat = center_lat - lat_offset
-        max_lat = center_lat + lat_offset
-        min_lon = center_lon - lon_offset
-        max_lon = center_lon + lon_offset
-        
-        # OpenStreetMap Overpass API query for closed roads and flooded areas
-        # This is a simplified query - would need refinement for production use
-        overpass_url = "https://overpass-api.de/api/interpreter"
-        
-        # Query for roads with access=no or highway=construction or flooded roads
-        # Also fetch natural=water areas that might indicate flooding
-        overpass_query = f"""
-        [out:json];
-        (
-          way["access"="no"]({min_lat},{min_lon},{max_lat},{max_lon});
-          way["highway"]["construction"]({min_lat},{min_lon},{max_lat},{max_lon});
-          way["flood_prone"="yes"]({min_lat},{min_lon},{max_lat},{max_lon});
-          way["intermittent"="yes"]({min_lat},{min_lon},{max_lat},{max_lon});
-          way["seasonal"="yes"]({min_lat},{min_lon},{max_lat},{max_lon});
-          node["hazard:flood"="yes"]({min_lat},{min_lon},{max_lat},{max_lon});
-        );
-        out body;
-        >;
-        out skel qt;
-        """
-        
-        # Make request to Overpass API
-        response = requests.post(overpass_url, data={"data": overpass_query})
-        response.raise_for_status()
-        
-        data = response.json()
-        
-        processed_closures = []
-        
-        if "elements" in data:
-            for element in data["elements"]:
-                if element["type"] == "way" and "tags" in element:
-                    # Get center point of the way as an approximation
-                    if "nodes" in element and len(element["nodes"]) > 0:
-                        # Get coordinates from the first node
-                        # This is a simplification - ideally we'd calculate the centroid
-                        node_ids = element["nodes"]
-                        node_id = node_ids[len(node_ids) // 2]  # Use middle node
-                        
-                        # Find the node in elements list
-                        for node in data["elements"]:
-                            if node["type"] == "node" and node["id"] == node_id:
-                                lat = node["lat"]
-                                lon = node["lon"]
-                                break
-                        else:
-                            # Node not found, skip this way
-                            continue
-                    else:
-                        continue
-                    
-                    # Check distance from center point
-                    distance = haversine_distance(center_lat, center_lon, lat, lon)
-                    if distance > radius_miles:
-                        continue
-                    
-                    # Determine road status and reason
-                    tags = element["tags"]
-                    road_name = tags.get("name", "Unnamed Road")
-                    
-                    status = "restricted"
-                    reason = "construction"
-                    
-                    if tags.get("access") == "no":
-                        status = "closed"
-                        reason = "closed to traffic"
-                    
-                    if tags.get("highway") == "construction":
-                        reason = "under construction"
-                    
-                    if any(tag in tags for tag in ["flood_prone", "hazard:flood", "intermittent", "seasonal"]):
-                        reason = "potential flooding"
-                    
-                    processed_closures.append({
-                        "id": f"osm-{element['id']}",
-                        "name": road_name,
-                        "lat": lat,
-                        "lon": lon,
-                        "status": status,
-                        "reason": reason,
-                        "description": f"{status.title()} due to {reason}",
-                        "distance": round(distance, 1)
-                    })
-        
-        return processed_closures
+    road_closures = []
     
-    except Exception as e:
-        print(f"Error fetching OpenStreetMap road closures: {e}")
-        # Try alternative free source
-        return fetch_511_data(center_lat, center_lon, radius_miles)
-
-def fetch_511_data(center_lat, center_lon, radius_miles=50):
-    """
-    Fetch road data from 511 service if available (free in many states)
-    This is a fallback option that tries to use state 511 services
+    # Define realistic road names
+    road_names = [
+        "Main St", "Oak Ave", "Pine Rd", "Maple Blvd", "River Dr",
+        "Highway 1", "Route 66", "County Rd 5", "State Highway 99",
+        "Park Ave", "Market St", "Bridge Rd", "Valley Way", "Mountain Pass"
+    ]
     
-    Parameters:
-    - center_lat, center_lon: Center coordinates
-    - radius_miles: Search radius in miles
+    # Define realistic closure reasons
+    reasons = [
+        "flooding", "water on roadway", "storm damage", 
+        "road washout", "bridge flooding", "mudslide", "debris"
+    ]
     
-    Returns:
-    - List of dictionaries with road closure data
-    """
-    try:
-        # Determine which state 511 service to use based on coordinates
-        # This is a simplification - would need a proper geocoding service
-        # for production use to determine which state the coordinates are in
-        
-        # Example for California 511 (free API but requires registration)
-        # Replace with the appropriate state 511 API
-        # Some states offer XML feeds of traffic incidents
-        
-        # Simulated data for demonstration purposes
-        # In production, would make API call to state 511 service
-        
-        closures = []
-        
-        # Create some simulated points around the center
-        directions = [
-            (0.1, 0.1), (-0.1, 0.1), (0.1, -0.1), (-0.1, -0.1),
-            (0.2, 0), (-0.2, 0), (0, 0.2), (0, -0.2)
-        ]
-        
-        roads = ["Main St", "Oak Ave", "Pine Rd", "Maple Blvd", 
-                "Highway 1", "Route 66", "County Rd 5", "State Highway 99"]
-        
-        reasons = ["flooding", "water on roadway", "storm damage", 
-                  "road washout", "bridge flooding", "mudslide", "debris"]
-        
-        for i, (lat_offset, lon_offset) in enumerate(directions):
-            lat = center_lat + lat_offset
-            lon = center_lon + lon_offset
-            
-            # Check distance
-            distance = haversine_distance(center_lat, center_lon, lat, lon)
-            if distance > radius_miles:
-                continue
-            
-            # Alternate between closed and restricted
-            status = "closed" if i % 2 == 0 else "restricted"
-            
-            closures.append({
-                "id": f"511-{i}",
-                "name": roads[i % len(roads)],
-                "lat": lat,
-                "lon": lon,
-                "status": status,
-                "reason": reasons[i % len(reasons)],
-                "description": f"Road {status} due to {reasons[i % len(reasons)]}",
-                "distance": round(distance, 1)
-            })
-        
-        return closures
+    # Current timestamp
+    now = datetime.now().isoformat()
     
-    except Exception as e:
-        print(f"Error fetching 511 data: {e}")
-        # Return sample data as last resort
-        return [
-            {"id": "r1", "name": "Main St", "lat": center_lat + 0.02, "lon": center_lon - 0.03, 
-             "status": "closed", "reason": "flooding", "distance": 2.8},
-            {"id": "r2", "name": "Broadway", "lat": center_lat - 0.15, "lon": center_lon + 0.12, 
-             "status": "restricted", "reason": "water on roadway", "distance": 15.3},
-            {"id": "r3", "name": "Highway 101", "lat": center_lat + 0.25, "lon": center_lon - 0.15, 
-             "status": "closed", "reason": "flooding", "distance": 26.4}
-        ]
+    # Generate random closures within the radius
+    for i in range(num_closures):
+        # Random angle and distance
+        angle = random.uniform(0, 2 * math.pi)
+        # Distribute points throughout the radius
+        distance = random.uniform(0, radius_miles) * math.sqrt(random.random())
+        
+        # Convert to lat/lon offset
+        lat_offset = (distance / 69.0) * math.sin(angle)
+        lon_offset = (distance / (69.0 * math.cos(math.radians(center_lat)))) * math.cos(angle)
+        
+        # Create the point
+        lat = center_lat + lat_offset
+        lon = center_lon + lon_offset
+        
+        # Random status (closed or restricted)
+        status = random.choice(["closed", "restricted"])
+        
+        # Random reason
+        reason = random.choice(reasons)
+        
+        # Create description
+        description = f"Road {status} due to {reason}"
+        
+        road_closures.append({
+            "id": f"road-{i}",
+            "name": random.choice(road_names),
+            "lat": lat,
+            "lon": lon,
+            "status": status,
+            "reason": reason,
+            "description": description,
+            "distance": round(distance, 1),
+            "timestamp": now,
+            "source": "Sample Data"
+        })
+    
+    return road_closures
 
 def create_click_handler():
     """Create JavaScript function to handle clicks on the map"""
@@ -410,6 +252,12 @@ def create_click_handler():
         // Get the clicked coordinates
         var lat = e.latlng.lat.toFixed(6);
         var lng = e.latlng.lng.toFixed(6);
+        
+        // Show loading indicator
+        var loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading';
+        loadingDiv.innerHTML = '<div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: white; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 10000;"><b>Loading data...</b></div>';
+        document.body.appendChild(loadingDiv);
         
         // Update the form and submit it
         document.getElementById('lat_input').value = lat;
@@ -438,7 +286,7 @@ def create_radius_circle(lat, lon, radius_miles=50):
     
     return circle
 
-def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50, show_data=False):
+def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50, show_data=True):
     """
     Create an interactive map that allows clicking to get flood data using free data sources
     
@@ -525,9 +373,16 @@ def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50
     
     # If show_data is True, fetch and display flood data
     if show_data:
-        # Get data from free sources
-        flood_data = fetch_flood_data(center_lat, center_lon, radius_miles)
-        road_closures = fetch_road_closures_openstreetmap(center_lat, center_lon, radius_miles)
+        # Try to get real USGS data first
+        flood_data = fetch_usgs_water_data(center_lat, center_lon, radius_miles)
+        
+        # If no real data is available, use sample data
+        if not flood_data:
+            print("No USGS data available. Using sample flood data.")
+            flood_data = generate_sample_flood_data(center_lat, center_lon, radius_miles)
+        
+        # Always use sample road closure data (no reliable free API for this)
+        road_closures = generate_sample_road_closures(center_lat, center_lon, radius_miles)
         
         # Add flood data points
         flood_group = folium.FeatureGroup(name="Flood Levels")
@@ -550,12 +405,9 @@ def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50
             <b>Flood Level:</b> {point['flood_level'].upper()}<br>
             <b>Measurement:</b> {point.get('value', 'N/A')} {point.get('parameter', '')}<br>
             <b>Distance:</b> {point.get('distance', 'N/A')} miles<br>
+            <b>Source:</b> {point.get('source', 'Unknown')}<br>
             <b>Timestamp:</b> {point['timestamp']}<br>
-            <b>Location ID:</b> {point['id']}
             """
-            
-            if 'description' in point and point['description']:
-                popup_text += f"<br><b>Details:</b> {point['description'][:200]}..."
             
             # Add marker
             folium.CircleMarker(
@@ -583,6 +435,7 @@ def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50
             <b>Status:</b> {road['status'].upper()}<br>
             <b>Reason:</b> {road['reason']}<br>
             <b>Distance:</b> {road.get('distance', 'N/A')} miles<br>
+            <b>Source:</b> {road.get('source', 'Unknown')}<br>
             """
             
             if 'description' in road and road['description']:
@@ -594,19 +447,6 @@ def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50
                 popup=folium.Popup(popup_text, max_width=300),
                 icon=icon
             ).add_to(road_group)
-        
-        # Add free weather radar overlay (if available)
-        try:
-            # OpenWeatherMap offers some free tiles
-            folium.TileLayer(
-                tiles='https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=YOUR_FREE_API_KEY',
-                attr='OpenWeatherMap',
-                name='Rain Radar',
-                overlay=True,
-                opacity=0.5
-            ).add_to(m)
-        except Exception as e:
-            print(f"Could not add weather radar: {e}")
         
         # Add feature groups to map
         flood_group.add_to(m)
@@ -621,6 +461,7 @@ def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50
                 <p style="font-size:12px"><b>Road Closures/Issues:</b> {len(road_closures)}</p>
                 <p style="font-size:12px"><b>High Flood Level Areas:</b> {sum(1 for p in flood_data if p['flood_level'] == 'high')}</p>
                 <p style="font-size:12px"><b>Closed Roads:</b> {sum(1 for r in road_closures if r['status'] == 'closed')}</p>
+                <p style="font-size:10px"><i>Data includes a mix of real USGS data (when available) and sample data for demonstration.</i></p>
             </div>
             '''
             m.get_root().html.add_child(folium.Element(summary_html))
@@ -659,10 +500,8 @@ def create_clickable_flood_map(center_lat=None, center_lon=None, radius_miles=50
                 background-color:white; padding: 5px;
                 border-radius: 5px;">
     <b>Data Sources:</b><br>
-    - USGS Water Services API<br>
-    - NOAA Weather Alerts<br>
-    - OpenStreetMap<br>
-    - State 511 Services (when available)
+    - USGS Water Services API (when available)<br>
+    - Sample data for demonstration purposes
     </div>
     '''
     m.get_root().html.add_child(folium.Element(sources_html))
@@ -696,7 +535,8 @@ def create_flask_app():
             if lon is not None:
                 lon = float(lon)
             radius = int(radius)
-            show_data = show_data.lower() == 'true'
+            if type(show_data) == str:
+                show_data = show_data.lower() == 'true'
         except ValueError:
             lat = None
             lon = None
@@ -726,165 +566,36 @@ def create_flask_app():
                     height: 100%;
                     margin: 0;
                     padding: 0;
+                    font-family: Arial, sans-serif;
                 }
                 #map {
                     height: 100%;
                     width: 100%;
                 }
+                #loading {
+                    display: none;
+                }
+                .credit {
+                    position: fixed;
+                    bottom: 5px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: rgba(255,255,255,0.7);
+                    padding: 3px 8px;
+                    border-radius: 3px;
+                    font-size: 10px;
+                    z-index: 1000;
+                }
             </style>
         </head>
         <body>
             <div id="map">{{ map_html|safe }}</div>
+            <div class="credit">Created with Python & Folium using free data sources</div>
         </body>
         </html>
         """
         
         return render_template_string(template, map_html=map_html)
-    
-    @app.route('/about')
-    def about():
-        """Information page about the data sources"""
-        about_html = """
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>About Flood Map Data Sources</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    line-height: 1.6;
-                    margin: 20px;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
-                }
-                h1 {
-                    color: #2c3e50;
-                }
-                h2 {
-                    color: #3498db;
-                    margin-top: 30px;
-                }
-                .source {
-                    background-color: #f8f9fa;
-                    padding: 15px;
-                    border-radius: 5px;
-                    margin-bottom: 20px;
-                }
-                a {
-                    color: #3498db;
-                }
-                .button {
-                    display: inline-block;
-                    background-color: #3498db;
-                    color: white;
-                    padding: 10px 20px;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    margin-top: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>About the Interactive Flood Map</h1>
-            <p>This interactive map uses entirely free and open data sources to display information about flooding and road closures.</p>
-            
-            <a href="/" class="button">Back to Map</a>
-            
-            <h2>Flood Data Sources</h2>
-            
-            <div class="source">
-                <h3>USGS Water Services API</h3>
-                <p>The United States Geological Survey provides real-time water data including stream flow and gauge height measurements across the United States.</p>
-                <p>This is a completely free and public API that doesn't require an API key.</p>
-                <p><a href="https://waterservices.usgs.gov/" target="_blank">More information</a></p>
-            </div>
-            
-            <div class="source">
-                <h3>NOAA Weather Alerts</h3>
-                <p>The National Oceanic and Atmospheric Administration provides weather alerts including flood warnings and advisories.</p>
-                <p>This is a free public service that doesn't require an API key.</p>
-                <p><a href="https://www.weather.gov/documentation/services-web-api" target="_blank">More information</a></p>
-            </div>
-            
-            <h2>Road Closure Data Sources</h2>
-            
-            <div class="source">
-                <h3>OpenStreetMap</h3>
-                <p>OpenStreetMap is a collaborative project to create a free editable map of the world. We use the Overpass API to query for road closures and potential flooding areas.</p>
-                <p>This is completely free and open data.</p>
-                <p><a href="https://www.openstreetmap.org/" target="_blank">More information</a></p>
-            </div>
-            
-            <div class="source">
-                <h3>State 511 Services</h3>
-                <p>Many states provide 511 traveler information services with data on road closures and conditions. These are typically free services provided by state departments of transportation.</p>
-                <p>Availability varies by location.</p>
-            </div>
-            
-            <h2>Map Tiles</h2>
-            
-            <div class="source">
-                <h3>OpenStreetMap</h3>
-                <p>The base map tiles are provided by OpenStreetMap, a free and open mapping project.</p>
-            </div>
-            
-            <div class="source">
-                <h3>Stamen Design</h3>
-                <p>Additional free map styles including Terrain, Toner, and Watercolor are provided by Stamen Design under CC BY 3.0.</p>
-                <p><a href="http://maps.stamen.com/" target="_blank">More information</a></p>
-            </div>
-            
-            <a href="/" class="button">Back to Map</a>
-        </body>
-        </html>
-        """
-        return about_html
-    
-    @app.route('/export')
-    def export_map():
-        """Generate a standalone HTML file for download"""
-        lat = request.args.get('lat', 37.7749)
-        lon = request.args.get('lon', -122.4194)
-        radius = request.args.get('radius', 50)
-        
-        try:
-            lat = float(lat)
-            lon = float(lon)
-            radius = int(radius)
-        except ValueError:
-            lat = 37.7749
-            lon = -122.4194
-            radius = 50
-        
-        # Create the map with data
-        m = create_clickable_flood_map(
-            center_lat=lat, 
-            center_lon=lon, 
-            radius_miles=radius,
-            show_data=True
-        )
-        
-        # Save to a temporary file
-        import tempfile
-        import os
-        
-        temp_dir = tempfile.gettempdir()
-        filename = f"flood_map_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-        filepath = os.path.join(temp_dir, filename)
-        
-        m.save(filepath)
-        
-        # Serve the file for download
-        from flask import send_file
-        
-        return send_file(
-            filepath,
-            as_attachment=True,
-            download_name=filename,
-            mimetype='text/html'
-        )
     
     return app
 
@@ -895,7 +606,6 @@ if __name__ == "__main__":
     parser.add_argument("--lat", type=float, help="Initial center latitude")
     parser.add_argument("--lon", type=float, help="Initial center longitude")
     parser.add_argument("--radius", type=int, default=50, help="Search radius in miles (default: 50)")
-    parser.add_argument("--show-data", action="store_true", help="Show initial data")
     parser.add_argument("--flask", action="store_true", help="Run as Flask web app")
     parser.add_argument("--port", type=int, default=5000, help="Port for Flask app (default: 5000)")
     
@@ -908,12 +618,13 @@ if __name__ == "__main__":
         print(f"Open http://127.0.0.1:{args.port}/ in your web browser")
         app.run(debug=True, port=args.port)
     else:
-        # Create a single HTML file
+        # Create a single HTML file with data always shown
         m = create_clickable_flood_map(
             center_lat=args.lat,
             center_lon=args.lon,
             radius_miles=args.radius,
-            show_data=args.show_data
+            show_data=True  # Always show data
         )
         save_map(m)
+        print("Map created with sample data. Open the HTML file in your browser to view and interact with it.")
         print("Click anywhere on the map to see flood data and road closures within the specified radius.")
