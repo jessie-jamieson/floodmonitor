@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Interactive Flood Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 10px;
+            left: 50px;
+            width: 280px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 180px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .summary {
+            position: fixed;
+            bottom: 20px;
+            left: 50px;
+            width: 250px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        h3 {
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+        
+        p {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        
+        .dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .red { background-color: red; }
+        .orange { background-color: orange; }
+        .blue { background-color: blue; }
+        
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 2000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="info-panel">
+        <h3>Interactive Flood Map</h3>
+        <p><strong>Click anywhere on the map</strong> to see flood data and road closures within a 50-mile radius.</p>
+        <p>Last updated: <span id="timestamp"></span></p>
+        <p><small>Using real USGS water data when available.</small></p>
+    </div>
+    
+    <div class="legend">
+        <h3>Legend</h3>
+        <p><span class="dot red"></span> High Flooding</p>
+        <p><span class="dot orange"></span> Medium Flooding</p>
+        <p><span class="dot blue"></span> Low Flooding</p>
+        <p><i class="fas fa-ban" style="color:red"></i> Road Closed</p>
+        <p><i class="fas fa-exclamation-triangle" style="color:orange"></i> Road Restricted</p>
+    </div>
+    
+    <div class="summary" id="summary">
+        <h3>Data Summary</h3>
+        <p>Click on the map to see flood data within a 50-mile radius.</p>
+    </div>
+    
+    <div id="loading">
+        <b>Loading data...</b>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Set the current timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // Initialize the map
+        const map = L.map('map').setView([37.7749, -122.4194], 9);
+        
+        // Add the base OpenStreetMap layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add Stamen Terrain layer
+        const terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+        });
+        
+        // Add Stamen Toner layer
+        const toner = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.png', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+        });
+        
+        // Add Stamen Watercolor layer
+        const watercolor = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+        });
+        
+        // Layer control
+        const baseMaps = {
+            "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }),
+            "Terrain": terrain,
+            "Toner": toner,
+            "Watercolor": watercolor
+        };
+        
+        L.control.layers(baseMaps).addTo(map);
+        
+        // Variables to store the layers
+        let currentMarker = null;
+        let currentCircle = null;
+        let floodGroup = L.layerGroup().addTo(map);
+        let roadGroup = L.layerGroup().addTo(map);
+        
+        // Function to calculate distance between two points
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            function toRad(x) {
+                return x * Math.PI / 180;
+            }
+            
+            const R = 3956; // Earth radius in miles
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        // Function to fetch real USGS water data
+        async function fetchUSGSData(lat, lon, radius) {
+            try {
+                // Truncate coordinates for URL parameters to 7 decimal places
+                const urlLat = parseFloat(lat.toFixed(7));
+                const urlLon = parseFloat(lon.toFixed(7));
+                
+                // Calculate a smaller bounding box to reduce data size
+                const searchRadius = Math.min(radius / 4, 10);  // Cap at 10 miles for initial search
+                const latOffset = searchRadius / 69.0;
+                const lonOffset = searchRadius / (69.0 * Math.cos(urlLat * Math.PI / 180));
+                
+                // Define the bounding box with truncated coordinates
+                const minLon = parseFloat((urlLon - lonOffset).toFixed(7));
+                const minLat = parseFloat((urlLat - latOffset).toFixed(7));
+                const maxLon = parseFloat((urlLon + lonOffset).toFixed(7));
+                const maxLat = parseFloat((urlLat + latOffset).toFixed(7));
+                
+                // Format the bounding box string
+                const bbox = `${minLon},${minLat},${maxLon},${maxLat}`;
+                
+                // USGS Water Services API endpoint
+                const baseUrl = "https://waterservices.usgs.gov/nwis/iv/";
+                
+                // Build the URL with parameters
+                const url = `${baseUrl}?format=json&bBox=${bbox}&parameterCd=00065&siteStatus=active`;
+                
+                console.log(`Fetching USGS data with bounding box: ${bbox}`);
+                
+                // Make the API request
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Process the response into our desired format
+                const processedData = [];
+                
+                if (data.value && data.value.timeSeries) {
+                    const sitesCount = data.value.timeSeries.length;
+                    console.log(`Received data for ${sitesCount} locations`);
+                    
+                    for (const site of data.value.timeSeries) {
+                        // Get site information
+                        const siteCode = site.sourceInfo.siteCode[0].value;
+                        const siteName = site.sourceInfo.siteName;
+                        
+                        // Get coordinates and truncate to 7 decimal places
+                        const siteLat = parseFloat(site.sourceInfo.geoLocation.geogLocation.latitude.toFixed(7));
+                        const siteLon = parseFloat(site.sourceInfo.geoLocation.geogLocation.longitude.toFixed(7));
+                        
+                        // Check if the site is within the full specified radius
+                        const distance = haversineDistance(lat, lon, siteLat, siteLon);
+                        if (distance > radius) {
+                            continue;
+                        }
+                        
+                        // Get parameter information
+                        const parameter = site.variable.variableName;
+                        
+                        // Get the latest reading
+                        if (site.values && site.values[0] && site.values[0].value && site.values[0].value.length > 0) {
+                            const latest = site.values[0].value[0];
+                            const value = parseFloat(latest.value);
+                            const timestamp = latest.dateTime;
+                            
+                            // Determine flood level based on gauge height
+                            let floodLevel = "low";
+                            if (parameter.toLowerCase().includes("gauge height")) {
+                                if (value > 15) {  // Example threshold for high flooding
+                                    floodLevel = "high";
+                                } else if (value > 10) {  // Example threshold for medium flooding
+                                    floodLevel = "medium";
+                                }
+                            }
+                            
+                            processedData.push({
+                                id: siteCode,
+                                name: siteName,
+                                lat: siteLat,
+                                lon: siteLon,
+                                parameter: parameter,
+                                value: value,
+                                floodLevel: floodLevel,
+                                timestamp: timestamp,
+                                distance: Math.round(distance * 10) / 10,
+                                source: "USGS"
+                            });
+                        }
+                    }
+                }
+                
+                console.log(`Successfully processed ${processedData.length} data points from USGS`);
+                return processedData;
+            } catch (error) {
+                console.error("Error fetching USGS data:", error);
+                return [];
+            }
+        }
+        
+        // Generate sample flood data points
+        function generateFloodData(lat, lon, radius) {
+            const floodData = [];
+            const streamNames = [
+                "Clear Creek", "Muddy River", "Rocky Branch", "Cedar Stream", 
+                "Pine River", "Oak Creek", "Maple Run", "Willow Stream",
+                "Eagle River", "Bear Creek", "Fox River", "Deer Stream"
+            ];
+            
+            const parameters = ["Gauge height, ft", "Discharge, cubic feet per second"];
+            const now = new Date().toISOString();
+            
+            // Number of points based on radius
+            const numPoints = Math.min(Math.ceil(radius / 5), 15);
+            
+            for (let i = 0; i < numPoints; i++) {
+                // Random angle and distance
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = Math.random() * radius * Math.sqrt(Math.random());
+                
+                // Convert to lat/lon offset
+                const latOffset = (distance / 69.0) * Math.sin(angle);
+                const lonOffset = (distance / (69.0 * Math.cos(lat * Math.PI / 180))) * Math.cos(angle);
+                
+                // Create the point
+                const pointLat = parseFloat((lat + latOffset).toFixed(7));
+                const pointLon = parseFloat((lon + lonOffset).toFixed(7));
+                
+                // Random flood level with weighted distribution
+                const randomValue = Math.random();
+                let floodLevel;
+                if (randomValue < 0.6) {
+                    floodLevel = "low";
+                } else if (randomValue < 0.9) {
+                    floodLevel = "medium";
+                } else {
+                    floodLevel = "high";
+                }
+                
+                // Random value based on flood level
+                const parameter = parameters[Math.floor(Math.random() * parameters.length)];
+                let value;
+                
+                if (parameter.includes("gauge height")) {
+                    if (floodLevel === "high") {
+                        value = (Math.random() * 10 + 15).toFixed(1);
+                    } else if (floodLevel === "medium") {
+                        value = (Math.random() * 5 + 10).toFixed(1);
+                    } else {
+                        value = (Math.random() * 8 + 2).toFixed(1);
+                    }
+                } else {  // discharge
+                    if (floodLevel === "high") {
+                        value = Math.round(Math.random() * 10000 + 10000);
+                    } else if (floodLevel === "medium") {
+                        value = Math.round(Math.random() * 5000 + 5000);
+                    } else {
+                        value = Math.round(Math.random() * 4500 + 500);
+                    }
+                }
+                
+                floodData.push({
+                    id: `sample-${i}`,
+                    name: streamNames[Math.floor(Math.random() * streamNames.length)],
+                    lat: pointLat,
+                    lon: pointLon,
+                    parameter: parameter,
+                    value: value,
+                    floodLevel: floodLevel,
+                    timestamp: now,
+                    distance: distance.toFixed(1),
+                    source: "Sample Data"
+                });
+            }
+            
+            return floodData;
+        }
+        
+        // Generate sample road closures
+        function generateRoadClosures(lat, lon, radius) {
+            const roadClosures = [];
+            
+            const roadNames = [
+                "Main St", "Oak Ave", "Pine Rd", "Maple Blvd", "River Dr",
+                "Highway 1", "Route 66", "County Rd 5", "State Highway 99",
+                "Park Ave", "Market St", "Bridge Rd", "Valley Way", "Mountain Pass"
+            ];
+            
+            const reasons = [
+                "flooding", "water on roadway", "storm damage", 
+                "road washout", "bridge flooding", "mudslide", "debris"
+            ];
+            
+            // Number of closures based on radius
+            const numClosures = Math.min(Math.ceil(radius / 10), 8);
+            
+            for (let i = 0; i < numClosures; i++) {
+                // Random angle and distance
+                const angle = Math.random() * 2 * Math.PI;
+                const distance = Math.random() * radius * Math.sqrt(Math.random());
+                
+                // Convert to lat/lon offset
+                const latOffset = (distance / 69.0) * Math.sin(angle);
+                const lonOffset = (distance / (69.0 * Math.cos(lat * Math.PI / 180))) * Math.cos(angle);
+                
+                // Create the point with truncated coordinates
+                const pointLat = parseFloat((lat + latOffset).toFixed(7));
+                const pointLon = parseFloat((lon + lonOffset).toFixed(7));
+                
+                // Random status (closed or restricted)
+                const status = Math.random() > 0.5 ? "closed" : "restricted";
+                
+                // Random reason
+                const reason = reasons[Math.floor(Math.random() * reasons.length)];
+                
+                // Create description
+                const description = `Road ${status} due to ${reason}`;
+                
+                roadClosures.push({
+                    id: `road-${i}`,
+                    name: roadNames[Math.floor(Math.random() * roadNames.length)],
+                    lat: pointLat,
+                    lon: pointLon,
+                    status: status,
+                    reason: reason,
+                    description: description,
+                    distance: distance.toFixed(1),
+                    source: "Sample Data"
+                });
+            }
+            
+            return roadClosures;
+        }
+        
+        // Function to display flood data on the map
+        async function displayFloodData(lat, lon, radius) {
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+            
+            // Clear existing layers
+            floodGroup.clearLayers();
+            roadGroup.clearLayers();
+            
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+            
+            if (currentCircle) {
+                map.removeLayer(currentCircle);
+            }
+            
+            // Truncate coordinates
+            lat = parseFloat(lat.toFixed(7));
+            lon = parseFloat(lon.toFixed(7));
+            
+            // Add marker at clicked location
+            currentMarker = L.marker([lat, lon]).addTo(map);
+            
+            // Add circle showing search radius
+            currentCircle = L.circle([lat, lon], {
+                radius: radius * 1609.34,  // Convert miles to meters
+                color: 'blue',
+                fillColor: 'blue',
+                fillOpacity: 0.1
+            }).addTo(map);
+            
+            // Try to get real USGS data
+            let floodData = await fetchUSGSData(lat, lon, radius);
+            let dataSource = "USGS";
+            
+            // If no real data is available, use sample data
+            if (!floodData || floodData.length === 0) {
+                console.log("No USGS data available. Using sample data.");
+                floodData = generateFloodData(lat, lon, radius);
+                dataSource = "Sample";
+            }
+            
+            // Always use sample road closure data
+            const roadClosures = generateRoadClosures(lat, lon, radius);
+            
+            // Add flood data points
+            floodData.forEach(point => {
+                let color, radius;
+                
+                if (point.floodLevel === "high") {
+                    color = "red";
+                    radius = 15;
+                } else if (point.floodLevel === "medium") {
+                    color = "orange";
+                    radius = 10;
+                } else {
+                    color = "blue";
+                    radius = 8;
+                }
+                
+                const popupContent = `
+                    <b>${point.name}</b><br>
+                    <b>Flood Level:</b> ${point.floodLevel.toUpperCase()}<br>
+                    <b>Measurement:</b> ${point.value} ${point.parameter}<br>
+                    <b>Distance:</b> ${point.distance} miles<br>
+                    <b>Source:</b> ${point.source}<br>
+                    <b>Timestamp:</b> ${new Date(point.timestamp).toLocaleString()}<br>
+                `;
+                
+                const marker = L.circleMarker([point.lat, point.lon], {
+                    radius: radius,
+                    color: color,
+                    fillColor: color,
+                    fillOpacity: 0.7
+                }).bindPopup(popupContent);
+                
+                floodGroup.addLayer(marker);
+            });
+            
+            // Add road closures
+            roadClosures.forEach(road => {
+                let icon;
+                
+                if (road.status === "closed") {
+                    icon = L.divIcon({
+                        html: '<i class="fas fa-ban" style="color: red; font-size: 24px;"></i>',
+                        className: 'custom-icon',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+                } else {
+                    icon = L.divIcon({
+                        html: '<i class="fas fa-exclamation-triangle" style="color: orange; font-size: 24px;"></i>',
+                        className: 'custom-icon',
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    });
+                }
+                
+                const popupContent = `
+                    <b>${road.name}</b><br>
+                    <b>Status:</b> ${road.status.toUpperCase()}<br>
+                    <b>Reason:</b> ${road.reason}<br>
+                    <b>Distance:</b> ${road.distance} miles<br>
+                    <b>Details:</b> ${road.description}<br>
+                `;
+                
+                const marker = L.marker([road.lat, road.lon], {
+                    icon: icon
+                }).bindPopup(popupContent);
+                
+                roadGroup.addLayer(marker);
+            });
+            
+            // Update the summary
+            const highFloodCount = floodData.filter(point => point.floodLevel === "high").length;
+            const closedRoadCount = roadClosures.filter(road => road.status === "closed").length;
+            
+            document.getElementById('summary').innerHTML = `
+                <h3>Data Summary</h3>
+                <p><b>Flood Monitoring Points:</b> ${floodData.length}</p>
+                <p><b>Road Closures/Issues:</b> ${roadClosures.length}</p>
+                <p><b>High Flood Level Areas:</b> ${highFloodCount}</p>
+                <p><b>Closed Roads:</b> ${closedRoadCount}</p>
+                <p><i>Using ${dataSource} data for flood information.</i></p>
+            `;
+            
+            // Update timestamp
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Hide loading indicator
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // Initialize with default data
+        displayFloodData(37.7749, -122.4194, 50);
+        
+        // Handle map clicks
+        map.on('click', function(e) {
+            displayFloodData(e.latlng.lat, e.latlng.lng, 50);
+        });
+    </script>
+</body>
+</html>

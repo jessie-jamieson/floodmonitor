@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>USGS Flood Gauge Map</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .info-panel {
+            position: fixed;
+            top: 10px;
+            left: 50px;
+            width: 280px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 180px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        .summary {
+            position: fixed;
+            bottom: 20px;
+            left: 50px;
+            width: 250px;
+            z-index: 1000;
+            background-color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        
+        h3 {
+            font-size: 16px;
+            margin: 0 0 10px 0;
+        }
+        
+        p {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+        
+        .dot {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .red { background-color: red; }
+        .orange { background-color: orange; }
+        .blue { background-color: blue; }
+        
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 2000;
+            display: none;
+        }
+        
+        .gauge-icon {
+            text-align: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            text-shadow: 0px 0px 2px black;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="info-panel">
+        <h3>USGS Flood Gauge Map</h3>
+        <p><strong>Click anywhere on the map</strong> to see USGS flood gauge data within a 10-mile radius.</p>
+        <p>Last updated: <span id="timestamp"></span></p>
+        <p><small>Data source: USGS Water Services</small></p>
+    </div>
+    
+    <div class="legend">
+        <h3>Legend</h3>
+        <p><span class="dot red"></span> High Water Level</p>
+        <p><span class="dot orange"></span> Medium Water Level</p>
+        <p><span class="dot blue"></span> Low Water Level</p>
+        <p><small>Click on any gauge for details</small></p>
+    </div>
+    
+    <div class="summary" id="summary">
+        <h3>Data Summary</h3>
+        <p>Click on the map to see USGS flood gauge data within a 100-mile radius.</p>
+    </div>
+    
+    <div id="loading">
+        <b>Loading USGS data...</b>
+    </div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Set the current timestamp
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // Define the search radius (10 miles)
+        const SEARCH_RADIUS = 100;
+        
+        // Initialize the map
+        const map = L.map('map').setView([37.7749, -122.4194], 100);
+        
+        // Add the base OpenStreetMap layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Add Stamen Terrain layer
+        const terrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.'
+        });
+        
+        // Add USGS Hydrography layer (NHD)
+        const usgsHydro = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'USGS National Hydrography Dataset',
+            maxZoom: 16
+        });
+        
+        // Add USGS Topo layer
+        const usgsTopo = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'USGS National Map',
+            maxZoom: 16
+        });
+        
+        // Layer control
+        const baseMaps = {
+            "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }),
+            "USGS Topo": usgsTopo,
+            "USGS Hydro": usgsHydro,
+            "Terrain": terrain
+        };
+        
+        L.control.layers(baseMaps).addTo(map);
+        
+        // Variables to store the layers
+        let currentMarker = null;
+        let currentCircle = null;
+        let gaugeGroup = L.layerGroup().addTo(map);
+        
+        // Function to calculate distance between two points
+        function haversineDistance(lat1, lon1, lat2, lon2) {
+            function toRad(x) {
+                return x * Math.PI / 180;
+            }
+            
+            const R = 3956; // Earth radius in miles
+            const dLat = toRad(lat2 - lat1);
+            const dLon = toRad(lon2 - lon1);
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+                    Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+        
+        // Function to create a custom gauge icon
+        function createGaugeIcon(value, floodLevel) {
+            let color;
+            let size;
+            
+            if (floodLevel === "high") {
+                color = "red";
+                size = 40;
+            } else if (floodLevel === "medium") {
+                color = "orange";
+                size = 36;
+            } else {
+                color = "blue";
+                size = 32;
+            }
+            
+            return L.divIcon({
+                html: `<div style="background-color:${color}; width:${size}px; height:${size}px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white;">${value.toFixed(1)}</div>`,
+                className: 'gauge-icon',
+                iconSize: [size, size],
+                iconAnchor: [size/2, size/2]
+            });
+        }
+        
+        // Function to fetch real USGS water data using our proxy
+        async function fetchUSGSData(lat, lon, radius) {
+            try {
+                // Truncate coordinates for URL parameters to 7 decimal places
+                const urlLat = parseFloat(lat.toFixed(7));
+                const urlLon = parseFloat(lon.toFixed(7));
+                
+                // Calculate a bounding box that covers the radius
+                const latOffset = radius / 69.0;
+                const lonOffset = radius / (69.0 * Math.cos(urlLat * Math.PI / 180));
+                
+                // Define the bounding box with truncated coordinates
+                const minLon = parseFloat((urlLon - lonOffset).toFixed(7));
+                const minLat = parseFloat((urlLat - latOffset).toFixed(7));
+                const maxLon = parseFloat((urlLon + lonOffset).toFixed(7));
+                const maxLat = parseFloat((urlLat + latOffset).toFixed(7));
+                
+                // Format the bounding box string
+                const bbox = `${minLon},${minLat},${maxLon},${maxLat}`;
+                
+                // Use our local Python proxy server
+                const proxyUrl = `/api/usgs?bbox=${bbox}&parameterCd=00065,00060`;
+                
+                console.log(`Fetching USGS data with bounding box: ${bbox}`);
+                
+                // Make the API request
+                const response = await fetch(proxyUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Process the response into our desired format
+                const processedData = [];
+                const sites = new Map(); // Use a Map to deduplicate sites
+                
+                if (data.value && data.value.timeSeries) {
+                    const sitesCount = data.value.timeSeries.length;
+                    console.log(`Received data for ${sitesCount} time series`);
+                    
+                    for (const series of data.value.timeSeries) {
+                        // Get site information
+                        const siteCode = series.sourceInfo.siteCode[0].value;
+                        const siteName = series.sourceInfo.siteName;
+                        
+                        // Get coordinates and truncate to 7 decimal places
+                        const siteLat = parseFloat(series.sourceInfo.geoLocation.geogLocation.latitude.toFixed(7));
+                        const siteLon = parseFloat(series.sourceInfo.geoLocation.geogLocation.longitude.toFixed(7));
+                        
+                        // Check if the site is within the specified radius
+                        const distance = haversineDistance(lat, lon, siteLat, siteLon);
+                        if (distance > radius) {
+                            continue;
+                        }
+                        
+                        // Get parameter information
+                        const parameter = series.variable.variableName;
+                        const parameterCode = series.variable.variableCode[0].value;
+                        const unit = series.variable.unit.unitCode;
+                        
+                        // Get the latest reading
+                        if (series.values && series.values[0] && series.values[0].value && series.values[0].value.length > 0) {
+                            const latest = series.values[0].value[0];
+                            const value = parseFloat(latest.value);
+                            const timestamp = latest.dateTime;
+                            
+                            // Create or update site data
+                            if (!sites.has(siteCode)) {
+                                sites.set(siteCode, {
+                                    id: siteCode,
+                                    name: siteName,
+                                    lat: siteLat,
+                                    lon: siteLon,
+                                    parameters: {},
+                                    distance: Math.round(distance * 10) / 10,
+                                    timestamp: timestamp
+                                });
+                            }
+                            
+                            // Add parameter data
+                            const site = sites.get(siteCode);
+                            site.parameters[parameterCode] = {
+                                name: parameter,
+                                value: value,
+                                unit: unit
+                            };
+                            
+                            // Update timestamp if newer
+                            if (new Date(timestamp) > new Date(site.timestamp)) {
+                                site.timestamp = timestamp;
+                            }
+                        }
+                    }
+                    
+                    // Process the sites into final data format
+                    for (const [siteCode, site] of sites.entries()) {
+                        // Determine flood level based on gauge height if available
+                        let floodLevel = "low";
+                        let displayValue = 0;
+                        
+                        // Prioritize gauge height (00065) if available
+                        if (site.parameters["00065"]) {
+                            const gaugeHeight = site.parameters["00065"].value;
+                            displayValue = gaugeHeight;
+                            
+                            if (gaugeHeight > 15) {
+                                floodLevel = "high";
+                            } else if (gaugeHeight > 10) {
+                                floodLevel = "medium";
+                            }
+                        } 
+                        // Otherwise use discharge (00060) if available
+                        else if (site.parameters["00060"]) {
+                            const discharge = site.parameters["00060"].value;
+                            displayValue = discharge / 1000; // Convert to thousands for display
+                            
+                            if (discharge > 10000) {
+                                floodLevel = "high";
+                            } else if (discharge > 5000) {
+                                floodLevel = "medium";
+                            }
+                        }
+                        
+                        // Add the processed site data
+                        processedData.push({
+                            ...site,
+                            floodLevel: floodLevel,
+                            displayValue: displayValue
+                        });
+                    }
+                }
+                
+                console.log(`Successfully processed ${processedData.length} gauge stations from USGS`);
+                return processedData;
+            } catch (error) {
+                console.error("Error fetching USGS data:", error);
+                return [];
+            }
+        }
+        
+        // Function to generate empty state message
+        function getEmptyStateMessage(lat, lon) {
+            return `
+                <h3>No USGS Gauges Found</h3>
+                <p>No USGS flood gauges were found within ${SEARCH_RADIUS} miles of this location.</p>
+                <p>Try clicking in a different area or increasing the search radius.</p>
+                <p><small>Coordinates: ${lat.toFixed(6)}, ${lon.toFixed(6)}</small></p>
+            `;
+        }
+        
+        // Function to display flood data on the map
+        async function displayFloodData(lat, lon, radius) {
+            // Show loading indicator
+            document.getElementById('loading').style.display = 'block';
+            
+            // Clear existing layers
+            gaugeGroup.clearLayers();
+            
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            }
+            
+            if (currentCircle) {
+                map.removeLayer(currentCircle);
+            }
+            
+            // Truncate coordinates
+            lat = parseFloat(lat.toFixed(7));
+            lon = parseFloat(lon.toFixed(7));
+            
+            // Add marker at clicked location
+            currentMarker = L.marker([lat, lon], {
+                icon: L.divIcon({
+                    html: '<i class="fas fa-crosshairs" style="color: #00CC00; font-size: 24px;"></i>',
+                    className: 'custom-icon',
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map);
+            
+            // Add circle showing search radius
+            currentCircle = L.circle([lat, lon], {
+                radius: radius * 1609.34,  // Convert miles to meters
+                color: '#00CC00',
+                fillColor: '#00CC00',
+                fillOpacity: 0.1,
+                weight: 2
+            }).addTo(map);
+            
+            // Fetch USGS data
+            const gaugeData = await fetchUSGSData(lat, lon, radius);
+            
+            // If no data is available, show empty state
+            if (!gaugeData || gaugeData.length === 0) {
+                document.getElementById('summary').innerHTML = getEmptyStateMessage(lat, lon);
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+            
+            // Add gauge stations to the map
+            gaugeData.forEach(station => {
+                // Create detailed popup content
+                let parametersHtml = '';
+                
+                // Add each parameter with proper formatting
+                for (const [code, param] of Object.entries(station.parameters)) {
+                    let formattedValue;
+                    
+                    // Format based on parameter type
+                    if (code === "00065") { // Gauge height
+                        formattedValue = `${param.value.toFixed(2)} ${param.unit}`;
+                    } else if (code === "00060") { // Discharge
+                        formattedValue = `${param.value.toLocaleString()} ${param.unit}`;
+                    } else {
+                        formattedValue = `${param.value} ${param.unit}`;
+                    }
+                    
+                    parametersHtml += `
+                        <tr>
+                            <td><strong>${param.name}:</strong></td>
+                            <td>${formattedValue}</td>
+                        </tr>
+                    `;
+                }
+                
+                const popupContent = `
+                    <div style="min-width: 200px;">
+                        <h3 style="margin: 0 0 5px 0; font-size: 16px;">${station.name}</h3>
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
+                            ${parametersHtml}
+                            <tr>
+                                <td><strong>Status:</strong></td>
+                                <td><span style="color: ${station.floodLevel === 'high' ? 'red' : station.floodLevel === 'medium' ? 'orange' : 'blue'}">
+                                    ${station.floodLevel.toUpperCase()}
+                                </span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Distance:</strong></td>
+                                <td>${station.distance} miles</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Updated:</strong></td>
+                                <td>${new Date(station.timestamp).toLocaleString()}</td>
+                            </tr>
+                        </table>
+                        <div style="font-size: 11px; margin-top: 5px;">
+                            <a href="https://waterdata.usgs.gov/nwis/inventory/?site_no=${station.id}" target="_blank">
+                                View on USGS Water Data
+                            </a>
+                        </div>
+                    </div>
+                `;
+                
+                // Create custom icon for the gauge
+                const icon = createGaugeIcon(station.displayValue, station.floodLevel);
+                
+                // Add marker
+                const marker = L.marker([station.lat, station.lon], {
+                    icon: icon
+                }).bindPopup(popupContent);
+                
+                gaugeGroup.addLayer(marker);
+            });
+            
+            // Update the summary
+            const highLevelCount = gaugeData.filter(station => station.floodLevel === "high").length;
+            const mediumLevelCount = gaugeData.filter(station => station.floodLevel === "medium").length;
+            
+            document.getElementById('summary').innerHTML = `
+                <h3>USGS Gauge Summary</h3>
+                <p><b>Total Gauges:</b> ${gaugeData.length}</p>
+                <p><b>High Water Level:</b> ${highLevelCount}</p>
+                <p><b>Medium Water Level:</b> ${mediumLevelCount}</p>
+                <p><b>Low Water Level:</b> ${gaugeData.length - highLevelCount - mediumLevelCount}</p>
+                <p><small>Data from USGS Water Services API</small></p>
+            `;
+            
+            // Update timestamp
+            document.getElementById('timestamp').textContent = new Date().toLocaleString();
+            
+            // Hide loading indicator
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        // Initialize with default data
+        displayFloodData(37.7749, -122.4194, SEARCH_RADIUS);
+        
+        // Handle map clicks
+        map.on('click', function(e) {
+            displayFloodData(e.latlng.lat, e.latlng.lng, SEARCH_RADIUS);
+        });
+    </script>
+</body>
+</html>
