@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>USGS Flood Gauge Map</title>
+    <title>Flood Monitoring & Warnings Map</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -25,7 +25,7 @@
             position: fixed;
             top: 10px;
             left: 50px;
-            width: 280px;
+            width: 300px;
             z-index: 1000;
             background-color: white;
             padding: 10px;
@@ -35,9 +35,9 @@
         
         .legend {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             right: 20px;
-            width: 180px;
+            width: 200px;
             z-index: 1000;
             background-color: white;
             padding: 10px;
@@ -47,9 +47,9 @@
         
         .summary {
             position: fixed;
-            bottom: 20px;
+            bottom: 30px;
             left: 50px;
-            width: 250px;
+            width: 280px;
             z-index: 1000;
             background-color: white;
             padding: 10px;
@@ -78,6 +78,7 @@
         .red { background-color: red; }
         .orange { background-color: orange; }
         .blue { background-color: blue; }
+        .purple { background-color: purple; }
         
         #loading {
             position: fixed;
@@ -99,24 +100,74 @@
             color: white;
             text-shadow: 0px 0px 2px black;
         }
+        
+        .alert-button {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #c00;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .alert-button:hover {
+            background-color: #a00;
+        }
+        
+        .alert-details {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+        }
+        
+        .alert-tag {
+            display: inline-block;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .tag-warning { background-color: orange; }
+        .tag-watch { background-color: #f5d742; color: black; }
+        .tag-advisory { background-color: #5bc0de; }
+        .tag-emergency { background-color: red; }
     </style>
 </head>
 <body>
     <div id="map"></div>
     
     <div class="info-panel">
-        <h3>USGS Flood Gauge Map</h3>
-        <p><strong>Click anywhere on the map</strong> to see USGS flood gauge data within a 10-mile radius.</p>
+        <h3>Flood Monitoring & Warnings Map</h3>
+        <p><strong>Click anywhere</strong> to see USGS flood gauge data within a 10-mile radius.</p>
+        <p>Toggle the Flood Warnings layer to see active NWS alerts.</p>
         <p>Last updated: <span id="timestamp"></span></p>
-        <p><small>Data source: USGS Water Services</small></p>
+        <p><small>Data sources: USGS Water Services & NWS Alerts</small></p>
+        <button class="alert-button" id="show-alerts-btn" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i> View Active Flood Warnings
+        </button>
+        <div class="alert-details" id="alert-details" style="display: none;"></div>
     </div>
     
     <div class="legend">
         <h3>Legend</h3>
+        <h4 style="margin: 8px 0 5px 0;">Gauge Levels</h4>
         <p><span class="dot red"></span> High Water Level</p>
         <p><span class="dot orange"></span> Medium Water Level</p>
         <p><span class="dot blue"></span> Low Water Level</p>
-        <p><small>Click on any gauge for details</small></p>
+        
+        <h4 style="margin: 12px 0 5px 0;">Weather Alerts</h4>
+        <p><span class="tag-emergency">&nbsp;</span> Flood Emergency</p>
+        <p><span class="tag-warning">&nbsp;</span> Flood Warning</p>
+        <p><span class="tag-watch">&nbsp;</span> Flood Watch</p>
+        <p><span class="tag-advisory">&nbsp;</span> Flood Advisory</p>
     </div>
     
     <div class="summary" id="summary">
@@ -125,7 +176,7 @@
     </div>
     
     <div id="loading">
-        <b>Loading USGS data...</b>
+        <b>Loading data...</b>
     </div>
     
     <!-- Leaflet JS -->
@@ -163,7 +214,11 @@
             maxZoom: 16
         });
         
-        // Layer control
+        // Layer groups for data
+        const gaugeGroup = L.layerGroup().addTo(map);
+        const alertsGroup = L.layerGroup();
+        
+        // Base and overlay layers for layer control
         const baseMaps = {
             "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -173,12 +228,21 @@
             "Terrain": terrain
         };
         
-        L.control.layers(baseMaps).addTo(map);
+        const overlayMaps = {
+            "Flood Gauges": gaugeGroup,
+            "Flood Warnings": alertsGroup
+        };
         
-        // Variables to store the layers
+        // Add layer controls
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+        
+        // Variables to store current selection
         let currentMarker = null;
         let currentCircle = null;
-        let gaugeGroup = L.layerGroup().addTo(map);
+        let currentState = null;
+        
+        // Store active alerts
+        let activeAlerts = [];
         
         // Function to calculate distance between two points
         function haversineDistance(lat1, lon1, lat2, lon2) {
@@ -361,23 +425,183 @@
             }
         }
         
+        // Function to fetch flood warnings from NOAA/NWS
+        async function fetchFloodWarnings(lat, lon, radius) {
+            try {
+                // Format the area parameter (lat,lon,radius)
+                const area = `${lat.toFixed(7)},${lon.toFixed(7)},${radius}`;
+                
+                // Use our local Python proxy server
+                const proxyUrl = `/api/alerts?area=${area}`;
+                
+                console.log(`Fetching NOAA alerts for area: ${area}`);
+                
+                // Make the API request
+                const response = await fetch(proxyUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Process the alerts - filter for flood-related alerts
+                if (data.features && data.features.length > 0) {
+                    console.log(`Received ${data.features.length} alerts from NWS`);
+                    
+                    // Filter for flood-related alerts
+                    const floodAlerts = data.features.filter(feature => {
+                        const event = feature.properties.event.toLowerCase();
+                        return event.includes('flood') || 
+                               event.includes('water') || 
+                               (event.includes('storm') && !event.includes('thunder'));
+                    });
+                    
+                    console.log(`Found ${floodAlerts.length} flood-related alerts`);
+                    
+                    // Store the active alerts
+                    activeAlerts = floodAlerts;
+                    
+                    // Show the alert button if we have alerts
+                    const alertButton = document.getElementById('show-alerts-btn');
+                    if (floodAlerts.length > 0) {
+                        alertButton.style.display = 'block';
+                        alertButton.innerHTML = `<i class="fas fa-exclamation-triangle"></i> View ${floodAlerts.length} Active Flood Alerts`;
+                    } else {
+                        alertButton.style.display = 'none';
+                    }
+                    
+                    return floodAlerts;
+                }
+                
+                console.log('No alerts found from NWS');
+                document.getElementById('show-alerts-btn').style.display = 'none';
+                return [];
+            } catch (error) {
+                console.error("Error fetching NOAA alerts:", error);
+                document.getElementById('show-alerts-btn').style.display = 'none';
+                return [];
+            }
+        }
+        
+        // Function to determine alert color based on event type
+        function getAlertColor(event, severity) {
+            event = event.toLowerCase();
+            severity = severity.toLowerCase();
+            
+            if (event.includes('emergency') || severity === 'extreme') {
+                return '#ff0000'; // Bright red for emergencies
+            } else if (event.includes('warning') || severity === 'severe') {
+                return '#ff8c00'; // Orange for warnings
+            } else if (event.includes('watch') || severity === 'moderate') {
+                return '#ffcc00'; // Yellow for watches
+            } else if (event.includes('advisory') || severity === 'minor') {
+                return '#1e90ff'; // Blue for advisories
+            } else {
+                return '#9370db'; // Purple for other alerts
+            }
+        }
+        
+        // Function to determine alert fill opacity based on severity
+        function getAlertOpacity(severity) {
+            severity = severity.toLowerCase();
+            
+            if (severity === 'extreme') {
+                return 0.5;
+            } else if (severity === 'severe') {
+                return 0.4;
+            } else if (severity === 'moderate') {
+                return 0.3;
+            } else {
+                return 0.2;
+            }
+        }
+        
+        // Function to create a tag for alert type
+        function createAlertTag(event) {
+            event = event.toLowerCase();
+            let tagClass = 'tag-advisory';
+            
+            if (event.includes('emergency')) {
+                tagClass = 'tag-emergency';
+            } else if (event.includes('warning')) {
+                tagClass = 'tag-warning';
+            } else if (event.includes('watch')) {
+                tagClass = 'tag-watch';
+            }
+            
+            return `<span class="alert-tag ${tagClass}">${event}</span>`;
+        }
+        
+        // Function to display alert details panel
+        function showAlertDetails() {
+            const alertDetails = document.getElementById('alert-details');
+            
+            if (activeAlerts.length === 0) {
+                alertDetails.innerHTML = '<p>No active flood alerts in this area.</p>';
+                alertDetails.style.display = 'block';
+                return;
+            }
+            
+            let html = '<h4>Active Flood Alerts</h4>';
+            
+            activeAlerts.forEach((alert, index) => {
+                const properties = alert.properties;
+                const event = properties.event;
+                const headline = properties.headline || 'No headline available';
+                const sent = new Date(properties.sent).toLocaleString();
+                const expires = new Date(properties.expires).toLocaleString();
+                
+                html += `
+                    <div style="margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #ddd;">
+                        <p><strong>${createAlertTag(event)} ${headline}</strong></p>
+                        <p><small>Sent: ${sent}</small></p>
+                        <p><small>Expires: ${expires}</small></p>
+                        <button onclick="showAlertDescription(${index})" style="font-size: 11px; padding: 3px 8px;">
+                            More Details
+                        </button>
+                    </div>
+                `;
+            });
+            
+            alertDetails.innerHTML = html;
+            alertDetails.style.display = 'block';
+        }
+        
+        // Function to show an individual alert description
+        function showAlertDescription(index) {
+            if (!activeAlerts[index]) return;
+            
+            const properties = activeAlerts[index].properties;
+            const description = properties.description || 'No description available';
+            const instruction = properties.instruction || 'No specific instructions provided';
+            
+            alert(`${properties.headline}\n\nDESCRIPTION:\n${description}\n\nINSTRUCTIONS:\n${instruction}`);
+        }
+        
+        // Add the alert description function to the global scope
+        window.showAlertDescription = showAlertDescription;
+        
+        // Add click handler to alert button
+        document.getElementById('show-alerts-btn').addEventListener('click', showAlertDetails);
+        
         // Function to generate empty state message
         function getEmptyStateMessage(lat, lon) {
             return `
-                <h3>No USGS Gauges Found</h3>
+                <h3>No USGS Gauges <h3>No USGS Gauges Found</h3>
                 <p>No USGS flood gauges were found within ${SEARCH_RADIUS} miles of this location.</p>
                 <p>Try clicking in a different area or increasing the search radius.</p>
                 <p><small>Coordinates: ${lat.toFixed(6)}, ${lon.toFixed(6)}</small></p>
             `;
         }
         
-        // Function to display flood data on the map
+        // Function to display flood data and warnings on the map
         async function displayFloodData(lat, lon, radius) {
             // Show loading indicator
             document.getElementById('loading').style.display = 'block';
             
             // Clear existing layers
             gaugeGroup.clearLayers();
+            alertsGroup.clearLayers();
             
             if (currentMarker) {
                 map.removeLayer(currentMarker);
@@ -386,6 +610,11 @@
             if (currentCircle) {
                 map.removeLayer(currentCircle);
             }
+            
+            // Reset active alerts
+            activeAlerts = [];
+            document.getElementById('show-alerts-btn').style.display = 'none';
+            document.getElementById('alert-details').style.display = 'none';
             
             // Truncate coordinates
             lat = parseFloat(lat.toFixed(7));
@@ -410,93 +639,165 @@
                 weight: 2
             }).addTo(map);
             
-            // Fetch USGS data
-            const gaugeData = await fetchUSGSData(lat, lon, radius);
+            // Fetch data in parallel
+            const [gaugeData, alertData] = await Promise.all([
+                fetchUSGSData(lat, lon, radius),
+                fetchFloodWarnings(lat, lon, radius * 5) // Use a larger radius for alerts
+            ]);
             
-            // If no data is available, show empty state
+            // If no gauge data is available, show empty state
             if (!gaugeData || gaugeData.length === 0) {
                 document.getElementById('summary').innerHTML = getEmptyStateMessage(lat, lon);
-                document.getElementById('loading').style.display = 'none';
-                return;
-            }
-            
-            // Add gauge stations to the map
-            gaugeData.forEach(station => {
-                // Create detailed popup content
-                let parametersHtml = '';
-                
-                // Add each parameter with proper formatting
-                for (const [code, param] of Object.entries(station.parameters)) {
-                    let formattedValue;
+            } else {
+                // Add gauge stations to the map
+                gaugeData.forEach(station => {
+                    // Create detailed popup content
+                    let parametersHtml = '';
                     
-                    // Format based on parameter type
-                    if (code === "00065") { // Gauge height
-                        formattedValue = `${param.value.toFixed(2)} ${param.unit}`;
-                    } else if (code === "00060") { // Discharge
-                        formattedValue = `${param.value.toLocaleString()} ${param.unit}`;
-                    } else {
-                        formattedValue = `${param.value} ${param.unit}`;
+                    // Add each parameter with proper formatting
+                    for (const [code, param] of Object.entries(station.parameters)) {
+                        let formattedValue;
+                        
+                        // Format based on parameter type
+                        if (code === "00065") { // Gauge height
+                            formattedValue = `${param.value.toFixed(2)} ${param.unit}`;
+                        } else if (code === "00060") { // Discharge
+                            formattedValue = `${param.value.toLocaleString()} ${param.unit}`;
+                        } else {
+                            formattedValue = `${param.value} ${param.unit}`;
+                        }
+                        
+                        parametersHtml += `
+                            <tr>
+                                <td><strong>${param.name}:</strong></td>
+                                <td>${formattedValue}</td>
+                            </tr>
+                        `;
                     }
                     
-                    parametersHtml += `
-                        <tr>
-                            <td><strong>${param.name}:</strong></td>
-                            <td>${formattedValue}</td>
-                        </tr>
-                    `;
-                }
-                
-                const popupContent = `
-                    <div style="min-width: 200px;">
-                        <h3 style="margin: 0 0 5px 0; font-size: 16px;">${station.name}</h3>
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
-                            ${parametersHtml}
-                            <tr>
-                                <td><strong>Status:</strong></td>
-                                <td><span style="color: ${station.floodLevel === 'high' ? 'red' : station.floodLevel === 'medium' ? 'orange' : 'blue'}">
-                                    ${station.floodLevel.toUpperCase()}
-                                </span></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Distance:</strong></td>
-                                <td>${station.distance} miles</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Updated:</strong></td>
-                                <td>${new Date(station.timestamp).toLocaleString()}</td>
-                            </tr>
-                        </table>
-                        <div style="font-size: 11px; margin-top: 5px;">
-                            <a href="https://waterdata.usgs.gov/nwis/inventory/?site_no=${station.id}" target="_blank">
-                                View on USGS Water Data
-                            </a>
+                    const popupContent = `
+                        <div style="min-width: 200px;">
+                            <h3 style="margin: 0 0 5px 0; font-size: 16px;">${station.name}</h3>
+                            <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;">
+                                ${parametersHtml}
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td><span style="color: ${station.floodLevel === 'high' ? 'red' : station.floodLevel === 'medium' ? 'orange' : 'blue'}">
+                                        ${station.floodLevel.toUpperCase()}
+                                    </span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Distance:</strong></td>
+                                    <td>${station.distance} miles</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Updated:</strong></td>
+                                    <td>${new Date(station.timestamp).toLocaleString()}</td>
+                                </tr>
+                            </table>
+                            <div style="font-size: 11px; margin-top: 5px;">
+                                <a href="https://waterdata.usgs.gov/nwis/inventory/?site_no=${station.id}" target="_blank">
+                                    View on USGS Water Data
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    `;
+                    
+                    // Create custom icon for the gauge
+                    const icon = createGaugeIcon(station.displayValue, station.floodLevel);
+                    
+                    // Add marker
+                    const marker = L.marker([station.lat, station.lon], {
+                        icon: icon
+                    }).bindPopup(popupContent);
+                    
+                    gaugeGroup.addLayer(marker);
+                });
+                
+                // Update the gauge summary
+                const highLevelCount = gaugeData.filter(station => station.floodLevel === "high").length;
+                const mediumLevelCount = gaugeData.filter(station => station.floodLevel === "medium").length;
+                
+                document.getElementById('summary').innerHTML = `
+                    <h3>USGS Gauge Summary</h3>
+                    <p><b>Total Gauges:</b> ${gaugeData.length}</p>
+                    <p><b>High Water Level:</b> ${highLevelCount}</p>
+                    <p><b>Medium Water Level:</b> ${mediumLevelCount}</p>
+                    <p><b>Low Water Level:</b> ${gaugeData.length - highLevelCount - mediumLevelCount}</p>
+                    ${alertData.length ? `<p><b>Flood Alerts:</b> ${alertData.length} active</p>` : ''}
+                    <p><small>Data from USGS Water Services API</small></p>
                 `;
-                
-                // Create custom icon for the gauge
-                const icon = createGaugeIcon(station.displayValue, station.floodLevel);
-                
-                // Add marker
-                const marker = L.marker([station.lat, station.lon], {
-                    icon: icon
-                }).bindPopup(popupContent);
-                
-                gaugeGroup.addLayer(marker);
-            });
+            }
             
-            // Update the summary
-            const highLevelCount = gaugeData.filter(station => station.floodLevel === "high").length;
-            const mediumLevelCount = gaugeData.filter(station => station.floodLevel === "medium").length;
-            
-            document.getElementById('summary').innerHTML = `
-                <h3>USGS Gauge Summary</h3>
-                <p><b>Total Gauges:</b> ${gaugeData.length}</p>
-                <p><b>High Water Level:</b> ${highLevelCount}</p>
-                <p><b>Medium Water Level:</b> ${mediumLevelCount}</p>
-                <p><b>Low Water Level:</b> ${gaugeData.length - highLevelCount - mediumLevelCount}</p>
-                <p><small>Data from USGS Water Services API</small></p>
-            `;
+            // Add flood warnings to the map
+            if (alertData && alertData.length > 0) {
+                alertData.forEach(alert => {
+                    const properties = alert.properties;
+                    const geometry = alert.geometry;
+                    
+                    // Skip alerts without geometry
+                    if (!geometry) return;
+                    
+                    // Get alert properties
+                    const event = properties.event;
+                    const severity = properties.severity;
+                    const headline = properties.headline || event;
+                    const description = properties.description || 'No description available';
+                    const instruction = properties.instruction || 'No specific instructions provided';
+                    const sent = new Date(properties.sent).toLocaleString();
+                    const expires = new Date(properties.expires).toLocaleString();
+                    
+                    // Get color based on event type and severity
+                    const color = getAlertColor(event, severity);
+                    const fillOpacity = getAlertOpacity(severity);
+                    
+                    // Create popup content
+                    const popupContent = `
+                        <div style="min-width: 250px;">
+                            <h3 style="margin: 0 0 5px 0; color: ${color};">${event}</h3>
+                            <h4>${headline}</h4>
+                            <p><strong>Severity:</strong> ${severity}</p>
+                            <p><strong>Issued:</strong> ${sent}</p>
+                            <p><strong>Expires:</strong> ${expires}</p>
+                            <div style="max-height: 150px; overflow-y: auto; margin-top: 10px; padding: 5px; background-color: #f5f5f5; border-radius: 4px;">
+                                <p>${description}</p>
+                                ${instruction ? `<p><strong>Instructions:</strong> ${instruction}</p>` : ''}
+                            </div>
+                            <p><small>Source: National Weather Service</small></p>
+                        </div>
+                    `;
+                    
+                    // Add the geometry - can be a polygon or a point
+                    if (geometry.type === 'Polygon') {
+                        // Convert GeoJSON coordinates to Leaflet format
+                        const coordinates = geometry.coordinates[0].map(coord => [coord[1], coord[0]]);
+                        
+                        // Create polygon
+                        const polygon = L.polygon(coordinates, {
+                            color: color,
+                            fillColor: color,
+                            fillOpacity: fillOpacity,
+                            weight: 2
+                        }).bindPopup(popupContent);
+                        
+                        alertsGroup.addLayer(polygon);
+                    } else if (geometry.type === 'Point') {
+                        const lat = geometry.coordinates[1];
+                        const lon = geometry.coordinates[0];
+                        
+                        // Create a circle marker for the point
+                        const circle = L.circle([lat, lon], {
+                            radius: 15000, // 15km radius for visibility
+                            color: color,
+                            fillColor: color,
+                            fillOpacity: fillOpacity,
+                            weight: 2
+                        }).bindPopup(popupContent);
+                        
+                        alertsGroup.addLayer(circle);
+                    }
+                });
+            }
             
             // Update timestamp
             document.getElementById('timestamp').textContent = new Date().toLocaleString();
